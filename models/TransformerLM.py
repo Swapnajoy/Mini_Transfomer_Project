@@ -1,0 +1,35 @@
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+from models.embedding import EmbeddingLayer
+from models.learnable_positional_encoding import LearnablePositionalEncoding
+from models.fixed_positional_encoding import SinusoidalPositionalEncoding
+from models.transformer_block import EncoderBlock
+
+class TransformerLanguageModel(nn.Module):
+    def __init__(self, vocab_size, embed_dim, max_seq_len, hidden_dim, num_heads, enc_ffn_h_dim, num_enc, use_sinusoidal=True):
+        super().__init__()
+        self.embed = EmbeddingLayer(vocab_size, embed_dim)
+        
+        if use_sinusoidal:
+            self.pe = SinusoidalPositionalEncoding(max_seq_len, embed_dim)
+        else:
+            self.pe = LearnablePositionalEncoding(max_seq_len, embed_dim)
+
+        self.encoders = nn.ModuleList([EncoderBlock(embed_dim, hidden_dim, num_heads, enc_ffn_h_dim) for _ in range(num_enc)])
+        self.ln = nn.LayerNorm(embed_dim)
+        self.ffn = nn.Linear(embed_dim, vocab_size)
+        self.dp = nn.Dropout(p=0.2)
+
+    def forward(self, x):
+        x = self.embed(x)
+        x = self.pe(x)
+        for layer in self.encoders:
+            x = layer(x)
+        x = self.dp(self.ffn(self.ln(x)))
+        return x
