@@ -15,6 +15,8 @@ class SinusoidalPositionalEncoding(nn.Module):
         
         self.register_buffer("sinusoidal_positional_encoding", pe)
 
+        self.dp = nn.Dropout(p=0.1)
+
     def forward(self, x):
         seq_len = x.shape[1]
-        return x + self.sinusoidal_positional_encoding[:seq_len,:]
+        return self.dp(x + self.sinusoidal_positional_encoding[:seq_len,:].to(x.device))
