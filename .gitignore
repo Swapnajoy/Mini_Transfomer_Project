@@ -1,0 +1,26 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+env/
+venv/
+
+# PyTorch checkpoint files
+*.pt
+*.pth
+
+# Jupyter Notebooks checkpoints
+.ipynb_checkpoints
+
+# VSCode settings
+.vscode/
+
+# Logs or debug
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
