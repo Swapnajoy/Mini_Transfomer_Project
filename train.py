@@ -1,7 +1,12 @@
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 from utils.tokenizer import Tokenizer
+from models.TransformerLM import TransformerLanguageModel
 
 class TextDataset(Dataset):
     def __init__(self, file_path, seq_len):
@@ -20,3 +25,9 @@ class TextDataset(Dataset):
         x = torch.tensor(self.tokens[index:index+self.seq_len], dtype=torch.long)
         y = torch.tensor(self.tokens[index+1:index+1+self.seq_len], dtype=torch.long)
         return x, y
+    
+    def vocab_size(self):
+        return len(self.tokenizer.vocab)
+
+dataset = TextDataset("data/alice_in_wonderland.txt", seq_len=8)
+dataloader = DataLoader(dataset, batch_size=32, shuffle=True, drop_last=True, num_workers=4)
