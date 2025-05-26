@@ -1,33 +1,57 @@
-import os
-import sys
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
-from utils.tokenizer import Tokenizer
-from models.TransformerLM import TransformerLanguageModel
+from datasets.text_dataset import TextDataset
+from models.transformerLM import TransformerLanguageModel
 
-class TextDataset(Dataset):
-    def __init__(self, file_path, seq_len):
-        self.tokenizer = Tokenizer(file_path)
-    
-        with open(file_path, encoding="utf-8") as f:
-            text = f.read()
-            self.tokens = self.tokenizer.encode(text)
+txt_file_path = "data/alice_in_wonderland.txt"
+seq_len = 8
 
-        self.seq_len = seq_len
+dataset = TextDataset(txt_file_path, seq_len=seq_len)
 
-    def __len__(self):
-        return len(self.tokens) - self.seq_len
-    
-    def __getitem__(self, index):
-        x = torch.tensor(self.tokens[index:index+self.seq_len], dtype=torch.long)
-        y = torch.tensor(self.tokens[index+1:index+1+self.seq_len], dtype=torch.long)
-        return x, y
-    
-    def vocab_size(self):
-        return len(self.tokenizer.vocab)
+vocab_size = dataset.vocab_size
 
-dataset = TextDataset("data/alice_in_wonderland.txt", seq_len=8)
-dataloader = DataLoader(dataset, batch_size=32, shuffle=True, drop_last=True, num_workers=4)
+batch_size = 32
+lr = 0.0003
+epochs = 30
+num_workers = 0
+
+embed_dim = 128
+num_heads = 4
+hidden_dim = 128
+enc_ffn_h_dim = 512
+num_enc = 6
+use_sinusoidal = True
+
+dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=num_workers)
+
+device = ('cuda' if torch.cuda.is_available() else 'cpu')
+
+model = TransformerLanguageModel(vocab_size, embed_dim, seq_len, hidden_dim, num_heads, enc_ffn_h_dim, num_enc, use_sinusoidal=use_sinusoidal).to(device)
+
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
+
+num_steps = len(dataloader)
+
+#Training Loop
+print(f"Entering training loop")
+model.train()
+for epoch in range(epochs):
+    running_loss = 0
+    for idx, (x, y) in enumerate(dataloader):
+        x = x.to(device)
+        y = y.to(device)
+        pred = model(x)
+
+        optimizer.zero_grad()
+        loss = criterion(pred.view(-1, vocab_size), y.view(-1))
+        loss.backward()
+        optimizer.step()
+
+        running_loss += loss.item()
+
+        if (idx+1)%20 == 0:
+            print(f"Step:{(idx+1)}/{num_steps}, loss: {loss.item():.3f}")
+         
+    print(f"epoch:{(epoch+1)}/{epochs}, avg. loss:{running_loss/num_steps}")
