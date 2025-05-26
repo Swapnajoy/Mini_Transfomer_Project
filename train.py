@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader
+from torch.utils.data import random_split
+
 from datasets.text_dataset import TextDataset
 from models.transformerLM import TransformerLanguageModel
 
@@ -8,12 +10,16 @@ txt_file_path = "data/alice_in_wonderland.txt"
 seq_len = 8
 
 dataset = TextDataset(txt_file_path, seq_len=seq_len)
-
 vocab_size = dataset.vocab_size
+
+train_size = int(0.8*len(dataset))
+val_size = len(dataset) - train_size
+
+train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
 batch_size = 32
 lr = 0.0003
-epochs = 30
+epochs = 50
 num_workers = 0
 
 embed_dim = 128
@@ -23,7 +29,8 @@ enc_ffn_h_dim = 512
 num_enc = 6
 use_sinusoidal = True
 
-dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=num_workers)
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=num_workers)
+val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, drop_last=True, num_workers=num_workers)
 
 device = ('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -32,14 +39,14 @@ model = TransformerLanguageModel(vocab_size, embed_dim, seq_len, hidden_dim, num
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
 
-num_steps = len(dataloader)
+num_steps = len(train_loader)
 
 #Training Loop
 print(f"Entering training loop")
 model.train()
 for epoch in range(epochs):
     running_loss = 0
-    for idx, (x, y) in enumerate(dataloader):
+    for idx, (x, y) in enumerate(train_loader):
         x = x.to(device)
         y = y.to(device)
         pred = model(x)
@@ -55,3 +62,20 @@ for epoch in range(epochs):
             print(f"Step:{(idx+1)}/{num_steps}, loss: {loss.item():.3f}")
          
     print(f"epoch:{(epoch+1)}/{epochs}, avg. loss:{running_loss/num_steps}")
+
+print("Training Completed.")
+
+model.eval()
+
+with torch.no_grad():
+
+    running_loss = 0
+    for idx, (x, y) in enumerate(train_loader):
+        x = x.to(device)
+        y = y.to(device)
+        pred = model(x)
+
+        loss = criterion(pred.view(-1, vocab_size), y.view(-1))
+        running_loss += loss.item()
+
+    print(f"Overall validation loss:{(running_loss/(idx+1)):.3f}")
