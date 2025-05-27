@@ -1,3 +1,5 @@
+import os
+
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -19,7 +21,7 @@ train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
 batch_size = 32
 lr = 0.0003
-epochs = 50
+epochs = 5
 num_workers = 0
 
 embed_dim = 128
@@ -58,7 +60,7 @@ for epoch in range(epochs):
 
         running_loss += loss.item()
 
-        if (idx+1)%20 == 0:
+        if (idx+1)%50 == 0:
             print(f"Step:{(idx+1)}/{num_steps}, loss: {loss.item():.3f}")
          
     print(f"epoch:{(epoch+1)}/{epochs}, avg. loss:{running_loss/num_steps}")
@@ -79,3 +81,24 @@ with torch.no_grad():
         running_loss += loss.item()
 
     print(f"Overall validation loss:{(running_loss/(idx+1)):.3f}")
+
+
+#Saving the model
+dataset_name = os.path.basename(txt_file_path)
+experiment_name = f"transformerLM_ep{epochs}_b{batch_size}_lr{lr}_dataset_{dataset_name}"
+experiment_dir = os.path.join("training_experiments", experiment_name)
+os.makedirs(experiment_dir, exist_ok=True)
+
+checkpoint_path = os.path.join(experiment_dir, "final_state.pth")
+torch.save(model.state_dict(), checkpoint_path)
+
+training_info = {
+    "epochs": epochs,
+    "batch_size": batch_size,
+    "learning_rate": lr,
+    "dataset": dataset_name,
+}
+
+with open(os.path.join(experiment_dir, "training_info.txt"), 'w') as f:
+    for key, value in training_info.items():
+        f.write(f"{key}: {value}\n")
