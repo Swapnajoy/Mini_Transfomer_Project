@@ -28,7 +28,7 @@ model.load_state_dict(torch.load(checkpoint_path))
 
 model.eval()
 
-seed_text = "In a land far far away"
+seed_text = "Alice was beginning to get very tired"
 
 generated_tokens = tokenizer.encode(seed_text)
 
@@ -37,17 +37,22 @@ if len(generated_tokens) > seq_len:
 else:    
     input_tokens = torch.tensor(generated_tokens).unsqueeze(0).to(device)
 
-#Generate 100 words
+
+#Generate 100 words and use top-k and temperature sampling
+temperature = 0.7
+k = 5
 
 with torch.no_grad():
     for _ in range(100):
         pred_logits = model(input_tokens)
 
-        next_token = torch.argmax(pred_logits[0, -1, :])
+        probs = torch.softmax(pred_logits[0, -1, :]/temperature, dim = -1)
+        topk_probs, topk_indices = torch.topk(probs, k)
+        next_token = torch.multinomial(topk_probs, 1)
 
         generated_tokens.append(next_token.cpu().item())
 
-        next_token = torch.tensor(next_token.to(device)).unsqueeze(0).unsqueeze(0)
+        next_token = torch.tensor(next_token.to(device)).unsqueeze(0)
 
         input_tokens = torch.cat((input_tokens, next_token), dim = 1)
 

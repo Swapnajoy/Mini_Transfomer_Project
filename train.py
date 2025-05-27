@@ -21,8 +21,8 @@ train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
 batch_size = 32
 lr = 0.0003
-epochs = 20
-num_workers = 0
+epochs = 30
+num_workers = 4
 
 embed_dim = 128
 num_heads = 4
