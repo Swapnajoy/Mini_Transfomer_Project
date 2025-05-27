@@ -69,7 +69,7 @@ for epoch in range(epochs):
         if (idx+1)%50 == 0:
             print(f"Step:{(idx+1)}/{num_steps}, loss: {loss.item():.3f}")
          
-    print(f"epoch:{(epoch+1)}/{epochs}, avg. loss:{running_loss/num_steps}")
+    print(f"epoch:{(epoch+1)}/{epochs}, avg. loss:{running_loss/num_steps:.3f}")
 
     if (epoch+1) % 10 == 0:
         checkpoint_path = os.path.join(experiment_dir, f"model_epoch_{epoch+1}.pth")
