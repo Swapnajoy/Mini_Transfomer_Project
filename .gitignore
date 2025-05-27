@@ -8,9 +8,14 @@ __pycache__/
 env/
 venv/
 
-# PyTorch checkpoint files
-*.pt
+# Ignore model training outputs
+training_experiments/
 *.pth
+*.pt
+
+# Other common ignores
+*.log
+*.csv
 
 # Jupyter Notebooks checkpoints
 .ipynb_checkpoints
