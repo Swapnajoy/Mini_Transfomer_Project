@@ -21,7 +21,7 @@ train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
 batch_size = 32
 lr = 0.0003
-epochs = 5
+epochs = 20
 num_workers = 0
 
 embed_dim = 128
@@ -30,6 +30,11 @@ hidden_dim = 128
 enc_ffn_h_dim = 512
 num_enc = 6
 use_sinusoidal = True
+
+dataset_name = os.path.basename(txt_file_path)
+experiment_name = f"transformerLM_ep{epochs}_b{batch_size}_lr{lr}_dataset_{dataset_name}"
+experiment_dir = os.path.join("training_experiments", experiment_name)
+os.makedirs(experiment_dir, exist_ok=True)
 
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=num_workers)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, drop_last=True, num_workers=num_workers)
@@ -46,6 +51,7 @@ num_steps = len(train_loader)
 #Training Loop
 print(f"Entering training loop")
 model.train()
+
 for epoch in range(epochs):
     running_loss = 0
     for idx, (x, y) in enumerate(train_loader):
@@ -65,6 +71,10 @@ for epoch in range(epochs):
          
     print(f"epoch:{(epoch+1)}/{epochs}, avg. loss:{running_loss/num_steps}")
 
+    if (epoch+1) % 10 == 0:
+        checkpoint_path = os.path.join(experiment_dir, f"model_epoch_{epoch+1}.pth")
+        torch.save(model.state_dict(), checkpoint_path)
+
 print("Training Completed.")
 
 model.eval()
@@ -80,23 +90,15 @@ with torch.no_grad():
         loss = criterion(pred.view(-1, vocab_size), y.view(-1))
         running_loss += loss.item()
 
-    print(f"Overall validation loss:{(running_loss/(idx+1)):.3f}")
-
-
-#Saving the model
-dataset_name = os.path.basename(txt_file_path)
-experiment_name = f"transformerLM_ep{epochs}_b{batch_size}_lr{lr}_dataset_{dataset_name}"
-experiment_dir = os.path.join("training_experiments", experiment_name)
-os.makedirs(experiment_dir, exist_ok=True)
-
-checkpoint_path = os.path.join(experiment_dir, "final_state.pth")
-torch.save(model.state_dict(), checkpoint_path)
+    validation_loss = running_loss/(idx+1)
+    print(f"Overall validation loss:{validation_loss:.3f}")
 
 training_info = {
     "epochs": epochs,
     "batch_size": batch_size,
     "learning_rate": lr,
     "dataset": dataset_name,
+    "validation_loss": validation_loss
 }
 
 with open(os.path.join(experiment_dir, "training_info.txt"), 'w') as f:
