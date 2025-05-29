@@ -81,9 +81,6 @@ for epoch in range(epochs):
         scheduler.step()
 
         running_loss += loss.item()
-
-        if (idx+1)%(steps_per_epoch//5) == 0:
-            print(f"Step:{(idx+1)}/{steps_per_epoch}, loss: {loss.item():.3f}")
          
     print(f"epoch:{(epoch+1)}/{epochs}, avg. loss:{running_loss/steps_per_epoch:.3f}")
 
@@ -103,7 +100,11 @@ with torch.no_grad():
         y = y.to(device)
         pred = model(x)
 
+        pred_token = torch.argmax(pred[0, -1, :]).cpu()
+        print("pred_token:", pred_token)
+
         loss = criterion(pred.view(-1, vocab_size), y.view(-1))
+        
         running_loss += loss.item()
 
     validation_loss = running_loss/len(val_loader)

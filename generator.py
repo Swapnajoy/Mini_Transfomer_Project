@@ -6,13 +6,13 @@ import torch.nn as nn
 from utils.tokenizer import Tokenizer
 from models.transformerLM import TransformerLanguageModel
 
-checkpoint_path = "/home/ros/repos/Mini_Transfomer_Project/training_experiments/transformerLM_ep50_b32_lr0.001_dataset_alice_in_wonderland.txt/model_epoch_50.pth"
+checkpoint_path = "training_experiments/transformerLM_ep40_b64_lr0.0006_dataset_alice_in_wonderland.txt/model_epoch_40.pth"
 txt_file_path = "data/alice_in_wonderland.txt"
 
 tokenizer = Tokenizer(txt_file_path)
-vocab_size = tokenizer.vocab_size()
+vocab_size = tokenizer.vocab_size
 
-seq_len = 256
+seq_len = 64
 embed_dim = 384
 num_heads = 6
 hidden_dim = 384
@@ -28,7 +28,7 @@ model.load_state_dict(torch.load(checkpoint_path))
 
 model.eval()
 
-seed_text = "Alice was beginning to get very tired"
+seed_text = "Alice was beginning to get very tired of sitting by her sister on the\nbank, and of having"
 
 generated_tokens = tokenizer.encode(seed_text)
 
@@ -38,23 +38,22 @@ else:
     input_tokens = torch.tensor(generated_tokens).unsqueeze(0).to(device)
 
 
-#Generate 100 words and use top-k and temperature sampling
+#Generate 500 characters and use top-k and temperature sampling
 temperature = 0.7
 k = 5
 
 with torch.no_grad():
-    for _ in range(100):
+    for _ in range(500):
         pred_logits = model(input_tokens)
 
         probs = torch.softmax(pred_logits[0, -1, :]/temperature, dim = -1)
         topk_probs, topk_indices = torch.topk(probs, k)
         next_token = torch.multinomial(topk_probs, 1)
+        next_token_idx = topk_indices[next_token]
 
-        generated_tokens.append(next_token.cpu().item())
-
-        next_token = next_token.to(device).unsqueeze(0)
-
-        input_tokens = torch.cat((input_tokens, next_token), dim = 1)
+        generated_tokens.append(next_token_idx.cpu().item())
+        next_token_idx = next_token_idx.to(device).unsqueeze(0)
+        input_tokens = torch.cat((input_tokens, next_token_idx), dim = 1)
 
         if input_tokens.shape[1] > seq_len:
             input_tokens = input_tokens[:, -seq_len:]
