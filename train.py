@@ -1,5 +1,7 @@
 import os
 
+from tqdm import tqdm
+
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -10,7 +12,7 @@ from datasets.text_dataset import TextDataset
 from models.transformerLM import TransformerLanguageModel
 
 txt_file_path = "data/alice_in_wonderland.txt"
-seq_len = 256
+seq_len = 64
 
 tokenizer = Tokenizer(txt_file_path)
 vocab_size = tokenizer.vocab_size
@@ -32,7 +34,7 @@ val_dataset = TextDataset(val_tokens, seq_len)
 
 batch_size = 64
 lr = 0.0006
-epochs = 50
+epochs = 40
 num_workers = 4
 
 embed_dim = 384
@@ -56,7 +58,7 @@ model = TransformerLanguageModel(vocab_size, embed_dim, seq_len, hidden_dim, num
 
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
-total_steps = epochs * (len(train_dataset) // batch_size)
+total_steps = epochs * (len(train_loader))
 scheduler = CosineAnnealingLR(optimizer, T_max=total_steps)
 
 steps_per_epoch = len(train_loader)
@@ -67,7 +69,7 @@ model.train()
 
 for epoch in range(epochs):
     running_loss = 0
-    for idx, (x, y) in enumerate(train_loader):
+    for idx, (x, y) in enumerate(tqdm(train_loader)):
         x = x.to(device)
         y = y.to(device)
         pred = model(x)
@@ -85,7 +87,7 @@ for epoch in range(epochs):
          
     print(f"epoch:{(epoch+1)}/{epochs}, avg. loss:{running_loss/steps_per_epoch:.3f}")
 
-    if epoch % 10 == 0:
+    if (epoch+1) % 10 == 0:
         checkpoint_path = os.path.join(experiment_dir, f"model_epoch_{epoch+1}.pth")
         torch.save(model.state_dict(), checkpoint_path)
 
@@ -96,7 +98,7 @@ model.eval()
 with torch.no_grad():
 
     running_loss = 0
-    for idx, (x, y) in enumerate(val_loader):
+    for idx, (x, y) in enumerate(tqdm(val_loader)):
         x = x.to(device)
         y = y.to(device)
         pred = model(x)
@@ -104,7 +106,7 @@ with torch.no_grad():
         loss = criterion(pred.view(-1, vocab_size), y.view(-1))
         running_loss += loss.item()
 
-    validation_loss = running_loss/(idx+1)
+    validation_loss = running_loss/len(val_loader)
     print(f"Overall validation loss:{validation_loss:.3f}")
 
 training_info = {
