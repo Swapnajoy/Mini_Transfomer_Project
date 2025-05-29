@@ -8,8 +8,8 @@ from torch.utils.data import random_split
 from datasets.text_dataset import TextDataset
 from models.transformerLM import TransformerLanguageModel
 
-txt_file_path = "data/alice_in_wonderland.txt"
-seq_len = 8
+txt_file_path = "data/tiny_shakespeare.txt"
+seq_len = 256
 
 dataset = TextDataset(txt_file_path, seq_len=seq_len)
 vocab_size = dataset.vocab_size
@@ -19,15 +19,15 @@ val_size = len(dataset) - train_size
 
 train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
-batch_size = 32
-lr = 0.0003
-epochs = 30
+batch_size = 64
+lr = 0.0006
+epochs = 40
 num_workers = 4
 
-embed_dim = 128
-num_heads = 4
-hidden_dim = 128
-enc_ffn_h_dim = 512
+embed_dim = 384
+num_heads = 6
+hidden_dim = 384
+enc_ffn_h_dim = 1536
 num_enc = 6
 use_sinusoidal = True
 
@@ -66,12 +66,12 @@ for epoch in range(epochs):
 
         running_loss += loss.item()
 
-        if (idx+1)%50 == 0:
+        if (idx+1)%(num_steps//5) == 0:
             print(f"Step:{(idx+1)}/{num_steps}, loss: {loss.item():.3f}")
          
     print(f"epoch:{(epoch+1)}/{epochs}, avg. loss:{running_loss/num_steps:.3f}")
 
-    if (epoch+1) % 10 == 0:
+    if (epoch+1) % 20 == 0:
         checkpoint_path = os.path.join(experiment_dir, f"model_epoch_{epoch+1}.pth")
         torch.save(model.state_dict(), checkpoint_path)
 

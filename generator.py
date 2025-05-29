@@ -6,17 +6,17 @@ import torch.nn as nn
 from utils.tokenizer import Tokenizer
 from models.transformerLM import TransformerLanguageModel
 
-checkpoint_path = "training_experiments/transformerLM_ep30_b32_lr0.0003_dataset_alice_in_wonderland.txt/model_epoch_30.pth"
+checkpoint_path = "/home/ros/repos/Mini_Transfomer_Project/training_experiments/transformerLM_ep50_b32_lr0.001_dataset_alice_in_wonderland.txt/model_epoch_50.pth"
 txt_file_path = "data/alice_in_wonderland.txt"
 
 tokenizer = Tokenizer(txt_file_path)
 vocab_size = tokenizer.vocab_size()
 
-seq_len = 8
-embed_dim = 128
-num_heads = 4
-hidden_dim = 128
-enc_ffn_h_dim = 512
+seq_len = 256
+embed_dim = 384
+num_heads = 6
+hidden_dim = 384
+enc_ffn_h_dim = 1536
 num_enc = 6
 use_sinusoidal = True
 
@@ -52,7 +52,7 @@ with torch.no_grad():
 
         generated_tokens.append(next_token.cpu().item())
 
-        next_token = torch.tensor(next_token.to(device)).unsqueeze(0)
+        next_token = next_token.to(device).unsqueeze(0)
 
         input_tokens = torch.cat((input_tokens, next_token), dim = 1)
 
