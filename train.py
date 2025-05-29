@@ -3,25 +3,36 @@ import os
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from torch.utils.data import random_split
+from torch.optim.lr_scheduler import CosineAnnealingLR
 
+from utils.tokenizer import Tokenizer
 from datasets.text_dataset import TextDataset
 from models.transformerLM import TransformerLanguageModel
 
-txt_file_path = "data/tiny_shakespeare.txt"
+txt_file_path = "data/alice_in_wonderland.txt"
 seq_len = 256
 
-dataset = TextDataset(txt_file_path, seq_len=seq_len)
-vocab_size = dataset.vocab_size
+tokenizer = Tokenizer(txt_file_path)
+vocab_size = tokenizer.vocab_size
 
-train_size = int(0.8*len(dataset))
-val_size = len(dataset) - train_size
+print(f"Dataset used:{txt_file_path.split('/')[-1]}, Vocab Size:{vocab_size}")
 
-train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+with open(txt_file_path, 'r', encoding='utf-8') as f:
+    full_text = f.read()
+
+split_idx = int(0.8 * len(full_text))
+train_text = full_text[:split_idx]
+val_text = full_text[split_idx:]
+
+train_tokens = tokenizer.encode(train_text)
+val_tokens = tokenizer.encode(val_text)
+
+train_dataset = TextDataset(train_tokens, seq_len)
+val_dataset = TextDataset(val_tokens, seq_len)
 
 batch_size = 64
 lr = 0.0006
-epochs = 40
+epochs = 50
 num_workers = 4
 
 embed_dim = 384
@@ -45,8 +56,10 @@ model = TransformerLanguageModel(vocab_size, embed_dim, seq_len, hidden_dim, num
 
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
+total_steps = epochs * (len(train_dataset) // batch_size)
+scheduler = CosineAnnealingLR(optimizer, T_max=total_steps)
 
-num_steps = len(train_loader)
+steps_per_epoch = len(train_loader)
 
 #Training Loop
 print(f"Entering training loop")
@@ -63,15 +76,16 @@ for epoch in range(epochs):
         loss = criterion(pred.view(-1, vocab_size), y.view(-1))
         loss.backward()
         optimizer.step()
+        scheduler.step()
 
         running_loss += loss.item()
 
-        if (idx+1)%(num_steps//5) == 0:
-            print(f"Step:{(idx+1)}/{num_steps}, loss: {loss.item():.3f}")
+        if (idx+1)%(steps_per_epoch//5) == 0:
+            print(f"Step:{(idx+1)}/{steps_per_epoch}, loss: {loss.item():.3f}")
          
-    print(f"epoch:{(epoch+1)}/{epochs}, avg. loss:{running_loss/num_steps:.3f}")
+    print(f"epoch:{(epoch+1)}/{epochs}, avg. loss:{running_loss/steps_per_epoch:.3f}")
 
-    if (epoch+1) % 20 == 0:
+    if epoch % 10 == 0:
         checkpoint_path = os.path.join(experiment_dir, f"model_epoch_{epoch+1}.pth")
         torch.save(model.state_dict(), checkpoint_path)
 
@@ -82,7 +96,7 @@ model.eval()
 with torch.no_grad():
 
     running_loss = 0
-    for idx, (x, y) in enumerate(train_loader):
+    for idx, (x, y) in enumerate(val_loader):
         x = x.to(device)
         y = y.to(device)
         pred = model(x)
