@@ -1,6 +1,5 @@
 import torch
 from torch.utils.data import Dataset
-from utils.tokenizer import Tokenizer
 
 class TextDataset(Dataset):
     def __init__(self, tokens, seq_len):

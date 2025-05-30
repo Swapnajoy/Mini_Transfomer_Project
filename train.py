@@ -7,14 +7,14 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import CosineAnnealingLR
 
-from utils.tokenizer import Tokenizer
+from utils.ch_tokenizer import CharTokenizer
 from datasets.text_dataset import TextDataset
 from models.transformerLM import TransformerLanguageModel
 
 txt_file_path = "data/alice_in_wonderland.txt"
 seq_len = 64
 
-tokenizer = Tokenizer(txt_file_path)
+tokenizer = CharTokenizer(txt_file_path)
 vocab_size = tokenizer.vocab_size
 
 print(f"Dataset used:{txt_file_path.split('/')[-1]}, Vocab Size:{vocab_size}")
