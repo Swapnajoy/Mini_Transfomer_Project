@@ -1,4 +1,4 @@
-class Tokenizer:
+class CharTokenizer:
     def __init__(self, file_path=None, text=None):
         #requires either file_path or text
         assert (text is not None) or (file_path is not None)

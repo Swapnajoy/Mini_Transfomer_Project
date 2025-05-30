@@ -3,13 +3,13 @@ import os
 import torch
 import torch.nn as nn
 
-from utils.tokenizer import Tokenizer
+from utils.ch_tokenizer import CharTokenizer
 from models.transformerLM import TransformerLanguageModel
 
 checkpoint_path = "training_experiments/transformerLM_ep40_b64_lr0.0006_dataset_alice_in_wonderland.txt/model_epoch_40.pth"
 txt_file_path = "data/alice_in_wonderland.txt"
 
-tokenizer = Tokenizer(txt_file_path)
+tokenizer = CharTokenizer(txt_file_path)
 vocab_size = tokenizer.vocab_size
 
 seq_len = 64
