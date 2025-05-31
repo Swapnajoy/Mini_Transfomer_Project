@@ -5,20 +5,21 @@ import torch.nn as nn
 
 from utils.ch_tokenizer import CharTokenizer
 from models.transformerLM import TransformerLanguageModel
+from config import CHECKPOINT_PATH, TXT_FILE_PATH, SEQ_LEN, MODEL_CONFIG, TOPK_CONFIG
 
-checkpoint_path = "training_experiments/transformerLM_ep40_b64_lr0.0006_dataset_alice_in_wonderland.txt/model_epoch_40.pth"
-txt_file_path = "data/alice_in_wonderland.txt"
+checkpoint_path = CHECKPOINT_PATH
+txt_file_path = TXT_FILE_PATH
 
 tokenizer = CharTokenizer(txt_file_path)
 vocab_size = tokenizer.vocab_size
 
-seq_len = 64
-embed_dim = 384
-num_heads = 6
-hidden_dim = 384
-enc_ffn_h_dim = 1536
-num_enc = 6
-use_sinusoidal = True
+seq_len = SEQ_LEN
+embed_dim = MODEL_CONFIG['embed_dim']
+num_heads = MODEL_CONFIG['num_heads']
+hidden_dim = MODEL_CONFIG['hidden_dim']
+enc_ffn_h_dim = MODEL_CONFIG['enc_ffn_h_dim']
+num_enc = MODEL_CONFIG['num_enc']
+use_sinusoidal = MODEL_CONFIG['use_sinusoidal']
 
 device = ('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -39,8 +40,8 @@ else:
 
 
 #Generate 500 characters and use top-k and temperature sampling
-temperature = 0.7
-k = 5
+temperature = TOPK_CONFIG['temperature']
+k = TOPK_CONFIG['k']
 
 with torch.no_grad():
     for _ in range(500):

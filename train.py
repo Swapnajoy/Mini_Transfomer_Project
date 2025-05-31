@@ -11,11 +11,14 @@ from utils.ch_tokenizer import CharTokenizer
 from datasets.text_dataset import TextDataset
 from models.transformerLM import TransformerLanguageModel
 
-txt_file_path = "data/alice_in_wonderland.txt"
-seq_len = 64
+from config import DATASET_PATH, SEQ_LEN, MODEL_CONFIG, TRAIN_CONFIG, CHECKPOINT_DIR, CHECKPOINT_PREFIX, SAVE_FREQ
+
+txt_file_path = DATASET_PATH
+seq_len = SEQ_LEN
 
 tokenizer = CharTokenizer(txt_file_path)
 vocab_size = tokenizer.vocab_size
+MODEL_CONFIG['vocab_size'] = vocab_size
 
 print(f"Dataset used:{txt_file_path.split('/')[-1]}, Vocab Size:{vocab_size}")
 
@@ -32,17 +35,17 @@ val_tokens = tokenizer.encode(val_text)
 train_dataset = TextDataset(train_tokens, seq_len)
 val_dataset = TextDataset(val_tokens, seq_len)
 
-batch_size = 64
-lr = 0.0006
-epochs = 40
-num_workers = 4
+batch_size = TRAIN_CONFIG['batch_size']
+lr = TRAIN_CONFIG['lr']
+epochs = TRAIN_CONFIG['epochs']
+num_workers = TRAIN_CONFIG['num_workers']
 
-embed_dim = 384
-num_heads = 6
-hidden_dim = 384
-enc_ffn_h_dim = 1536
-num_enc = 6
-use_sinusoidal = True
+embed_dim = MODEL_CONFIG['embed_dim']
+num_heads = MODEL_CONFIG['num_heads']
+hidden_dim = MODEL_CONFIG['hidden_dim']
+enc_ffn_h_dim = MODEL_CONFIG['enc_ffn_h_dim']
+num_enc = MODEL_CONFIG['num_enc']
+use_sinusoidal = MODEL_CONFIG['use_sinusoidal']
 
 dataset_name = os.path.basename(txt_file_path)
 experiment_name = f"transformerLM_ep{epochs}_b{batch_size}_lr{lr}_dataset_{dataset_name}"
@@ -58,10 +61,10 @@ model = TransformerLanguageModel(vocab_size, embed_dim, seq_len, hidden_dim, num
 
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
-total_steps = epochs * (len(train_loader))
-scheduler = CosineAnnealingLR(optimizer, T_max=total_steps)
 
 steps_per_epoch = len(train_loader)
+total_steps = epochs * steps_per_epoch
+scheduler = CosineAnnealingLR(optimizer, T_max=total_steps)
 
 #Training Loop
 print(f"Entering training loop")
@@ -84,7 +87,7 @@ for epoch in range(epochs):
          
     print(f"epoch:{(epoch+1)}/{epochs}, avg. loss:{running_loss/steps_per_epoch:.3f}")
 
-    if (epoch+1) % 10 == 0:
+    if (epoch+1) % SAVE_FREQ == 0:
         checkpoint_path = os.path.join(experiment_dir, f"model_epoch_{epoch+1}.pth")
         torch.save(model.state_dict(), checkpoint_path)
 
@@ -99,9 +102,6 @@ with torch.no_grad():
         x = x.to(device)
         y = y.to(device)
         pred = model(x)
-
-        pred_token = torch.argmax(pred[0, -1, :]).cpu()
-        print("pred_token:", pred_token)
 
         loss = criterion(pred.view(-1, vocab_size), y.view(-1))
         
