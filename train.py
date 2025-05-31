@@ -68,9 +68,16 @@ scheduler = CosineAnnealingLR(optimizer, T_max=total_steps)
 
 #Training Loop
 print(f"Entering training loop")
-model.train()
+
+training_info = {
+    "epochs": epochs,
+    "batch_size": batch_size,
+    "learning_rate": lr,
+    "dataset": dataset_name,
+}
 
 for epoch in range(epochs):
+    model.train()
     running_loss = 0
     for idx, (x, y) in enumerate(tqdm(train_loader)):
         x = x.to(device)
@@ -88,6 +95,23 @@ for epoch in range(epochs):
     print(f"epoch:{(epoch+1)}/{epochs}, avg. loss:{running_loss/steps_per_epoch:.3f}")
 
     if (epoch+1) % SAVE_FREQ == 0:
+        model.eval()
+        
+        with torch.no_grad():
+            running_loss = 0
+            for idx, (x, y) in enumerate(val_loader):
+                x = x.to(device)
+                y = y.to(device)
+                pred = model(x)
+
+                loss = criterion(pred.view(-1, vocab_size), y.view(-1))
+                
+                running_loss += loss.item()
+
+            validation_loss = running_loss/len(val_loader)
+            print(f"Validation loss after {epoch+1} epochs:{validation_loss:.3f}")
+            training_info[f'{epoch+1} epoch val_loss'] = validation_loss
+
         checkpoint_path = os.path.join(experiment_dir, f"model_epoch_{epoch+1}.pth")
         torch.save(model.state_dict(), checkpoint_path)
 
@@ -110,13 +134,7 @@ with torch.no_grad():
     validation_loss = running_loss/len(val_loader)
     print(f"Overall validation loss:{validation_loss:.3f}")
 
-training_info = {
-    "epochs": epochs,
-    "batch_size": batch_size,
-    "learning_rate": lr,
-    "dataset": dataset_name,
-    "validation_loss": validation_loss
-}
+training_info['Overall_val_loss'] = validation_loss
 
 with open(os.path.join(experiment_dir, "training_info.txt"), 'w') as f:
     for key, value in training_info.items():
