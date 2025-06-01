@@ -91,10 +91,13 @@ for epoch in range(epochs):
         scheduler.step()
 
         running_loss += loss.item()
-         
-    print(f"epoch:{(epoch+1)}/{epochs}, avg. loss:{running_loss/steps_per_epoch:.3f}")
+
+    training_loss = running_loss/steps_per_epoch 
+    print(f"epoch:{(epoch+1)}/{epochs}, avg. loss:{training_loss:.5f}")
 
     if (epoch+1) % SAVE_FREQ == 0:
+        training_info[f'{epoch+1} epoch training_loss'] = training_loss
+
         model.eval()
         
         with torch.no_grad():

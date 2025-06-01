@@ -4,7 +4,7 @@ import os
 # ======================
 
 DATASET_PATH = "data/alice_in_wonderland.txt"
-SEQ_LEN = 64
+SEQ_LEN = 128
 
 # Model Configurations
 # ====================
@@ -25,7 +25,7 @@ MODEL_CONFIG = {
 TRAIN_CONFIG = {
     "batch_size" : 64,
     "lr" : 0.0006,
-    "epochs" : 40,
+    "epochs" : 30,
     "num_workers" : 4,
     }
 
@@ -34,12 +34,12 @@ TRAIN_CONFIG = {
 
 CHECKPOINT_DIR = "training_experiments"
 CHECKPOINT_PREFIX = "transformerLM"
-SAVE_FREQ = 10
+SAVE_FREQ = 3
 
 # Generator Configurations
 # ========================
 
-CHECKPOINT_PATH = "training_experiments/transformerLM_ep40_b64_lr0.0006_dataset_alice_in_wonderland.txt/model_epoch_40.pth"
+CHECKPOINT_PATH = "training_experiments/transformerLM_ep20_b64_lr0.0006_dataset_alice_in_wonderland.txt/model_epoch_14.pth"
 TXT_FILE_PATH = "data/alice_in_wonderland.txt"
 
 # Top-K Sampling Configurations
