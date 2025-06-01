@@ -39,7 +39,7 @@ SAVE_FREQ = 3
 # Generator Configurations
 # ========================
 
-CHECKPOINT_PATH = "training_experiments/transformerLM_ep20_b64_lr0.0006_dataset_alice_in_wonderland.txt/model_epoch_14.pth"
+CHECKPOINT_PATH = "training_experiments/transformerLM_ep30_b64_lr0.0006_dataset_alice_in_wonderland.txt/model_epoch_15.pth"
 TXT_FILE_PATH = "data/alice_in_wonderland.txt"
 
 # Top-K Sampling Configurations

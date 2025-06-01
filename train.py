@@ -137,7 +137,7 @@ with torch.no_grad():
     validation_loss = running_loss/len(val_loader)
     print(f"Overall validation loss:{validation_loss:.3f}")
 
-training_info['Overall_val_loss'] = validation_loss
+training_info['Overall_validation_loss'] = validation_loss
 
 with open(os.path.join(experiment_dir, "training_info.txt"), 'w') as f:
     for key, value in training_info.items():
