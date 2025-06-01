@@ -50,6 +50,8 @@ use_sinusoidal = MODEL_CONFIG['use_sinusoidal']
 dataset_name = os.path.basename(txt_file_path)
 experiment_name = f"transformerLM_ep{epochs}_b{batch_size}_lr{lr}_dataset_{dataset_name}"
 experiment_dir = os.path.join("training_experiments", experiment_name)
+log_path = os.path.join(experiment_dir, "training_info.txt")
+
 os.makedirs(experiment_dir, exist_ok=True)
 
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=num_workers)
@@ -66,15 +68,12 @@ steps_per_epoch = len(train_loader)
 total_steps = epochs * steps_per_epoch
 scheduler = CosineAnnealingLR(optimizer, T_max=total_steps)
 
+if not os.path.exists(log_path):
+    with open(log_path, 'w') as f:
+        f.write("epoch,training_loss,validation_loss,perplexity\n")
+
 #Training Loop
 print(f"Entering training loop")
-
-training_info = {
-    "epochs": epochs,
-    "batch_size": batch_size,
-    "learning_rate": lr,
-    "dataset": dataset_name,
-}
 
 for epoch in range(epochs):
     model.train()
@@ -96,7 +95,6 @@ for epoch in range(epochs):
     print(f"epoch:{(epoch+1)}/{epochs}, avg. loss:{training_loss:.5f}")
 
     if (epoch+1) % SAVE_FREQ == 0:
-        training_info[f'{epoch+1} epoch training_loss'] = training_loss
 
         model.eval()
         
@@ -111,12 +109,16 @@ for epoch in range(epochs):
                 
                 running_loss += loss.item()
 
-            validation_loss = running_loss/len(val_loader)
-            print(f"Validation loss after {epoch+1} epochs:{validation_loss:.3f}")
-            training_info[f'{epoch+1} epoch val_loss'] = validation_loss
+            val_loss = running_loss/len(val_loader)
+            perplexity = torch.exp(torch.tensor(val_loss)).item()
 
         checkpoint_path = os.path.join(experiment_dir, f"model_epoch_{epoch+1}.pth")
         torch.save(model.state_dict(), checkpoint_path)
+
+        print(f"epoch : {epoch+1}, training_loss : {training_loss:.5f}, validation_loss : {val_loss:.5f}, perplexity : {perplexity:.2f}\n")
+        log_line = f"{epoch+1},{training_loss:.5f},{val_loss:.5f},{perplexity:.2f}\n"
+        with open(os.path.join(experiment_dir, "training_info.txt"), 'a') as f:
+            f.write(log_line)
 
 print("Training Completed.")
 
@@ -137,8 +139,5 @@ with torch.no_grad():
     validation_loss = running_loss/len(val_loader)
     print(f"Overall validation loss:{validation_loss:.3f}")
 
-training_info['Overall_validation_loss'] = validation_loss
-
-with open(os.path.join(experiment_dir, "training_info.txt"), 'w') as f:
-    for key, value in training_info.items():
-        f.write(f"{key}: {value}\n")
+final_model_path = os.path.join(experiment_dir, "model_final.pth")
+torch.save(model.state_dict(), final_model_path)
