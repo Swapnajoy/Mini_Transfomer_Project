@@ -128,7 +128,7 @@ with torch.no_grad():
     for idx, (x, y) in enumerate(tqdm(val_loader)):
         x = x.to(device)
         y = y.to(device)
-        pred = model(x)
+        pred, _ = model(x)
 
         loss = criterion(pred.view(-1, vocab_size), y.view(-1))
         
