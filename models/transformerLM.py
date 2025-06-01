@@ -9,7 +9,7 @@ import torch.nn.functional as F
 from models.embedding import EmbeddingLayer
 from models.learnable_positional_encoding import LearnablePositionalEncoding
 from models.fixed_positional_encoding import SinusoidalPositionalEncoding
-from models.transformer_block import EncoderBlock
+from models.encoder_block import EncoderBlock
 
 class TransformerLanguageModel(nn.Module):
     def __init__(self, vocab_size, embed_dim, max_seq_len, hidden_dim, num_heads, enc_ffn_h_dim, num_enc, use_sinusoidal=True):
