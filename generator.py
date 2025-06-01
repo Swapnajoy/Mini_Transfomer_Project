@@ -45,7 +45,7 @@ k = TOPK_CONFIG['k']
 
 with torch.no_grad():
     for _ in range(500):
-        pred_logits = model(input_tokens)
+        pred_logits, _ = model(input_tokens)
 
         probs = torch.softmax(pred_logits[0, -1, :]/temperature, dim = -1)
         topk_probs, topk_indices = torch.topk(probs, k)

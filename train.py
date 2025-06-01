@@ -82,7 +82,7 @@ for epoch in range(epochs):
     for idx, (x, y) in enumerate(tqdm(train_loader)):
         x = x.to(device)
         y = y.to(device)
-        pred = model(x)
+        pred, _ = model(x)
 
         optimizer.zero_grad()
         loss = criterion(pred.view(-1, vocab_size), y.view(-1))
@@ -105,7 +105,7 @@ for epoch in range(epochs):
             for idx, (x, y) in enumerate(val_loader):
                 x = x.to(device)
                 y = y.to(device)
-                pred = model(x)
+                pred, _ = model(x)
 
                 loss = criterion(pred.view(-1, vocab_size), y.view(-1))
                 
