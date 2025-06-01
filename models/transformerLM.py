@@ -29,7 +29,11 @@ class TransformerLanguageModel(nn.Module):
     def forward(self, x):
         x = self.embed(x)
         x = self.pe(x)
+
+        attention_weights = []
+
         for layer in self.encoders:
-            x = layer(x)
+            x, weights = layer(x)
+            attention_weights.append(weights)
         x = self.dp(self.ffn(self.ln(x)))
-        return x
+        return x, attention_weights

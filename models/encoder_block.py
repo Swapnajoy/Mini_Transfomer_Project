@@ -18,6 +18,7 @@ class EncoderBlock(nn.Module):
         self.dp2 = nn.Dropout(p=0.2)
 
     def forward(self, x):
-        x = x + self.dp1(self.attention(self.ln1(x)))
+        scores, weights = self.attention(self.ln1(x))
+        x = x + self.dp1(scores)
         x = x + self.dp2(self.feedforward(self.ln2(x)))
-        return x
+        return x, weights

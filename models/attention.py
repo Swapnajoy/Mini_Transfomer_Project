@@ -32,4 +32,4 @@ class MultiHeadAttentionBlock(nn.Module):
         weighted_values = weighted_values.permute(0, 2, 1, 3)
         weighted_values = weighted_values.reshape(weighted_values.shape[0], weighted_values.shape[1], -1)
 
-        return self.Wo(weighted_values)
+        return self.Wo(weighted_values), attention_weights
