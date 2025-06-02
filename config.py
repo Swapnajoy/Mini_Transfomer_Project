@@ -25,7 +25,7 @@ MODEL_CONFIG = {
 TRAIN_CONFIG = {
     "batch_size" : 64,
     "lr" : 0.0006,
-    "epochs" : 30,
+    "epochs" : 24,
     "num_workers" : 4,
     }
 

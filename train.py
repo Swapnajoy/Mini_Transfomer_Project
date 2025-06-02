@@ -7,6 +7,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import CosineAnnealingLR
 
+#See utils for available tokenizer options. Update experiment_name accordingly.
 from utils.ch_tokenizer import CharTokenizer
 from datasets.text_dataset import TextDataset
 from models.transformerLM import TransformerLanguageModel
@@ -48,8 +49,8 @@ num_enc = MODEL_CONFIG['num_enc']
 use_sinusoidal = MODEL_CONFIG['use_sinusoidal']
 
 dataset_name = os.path.basename(txt_file_path)
-experiment_name = f"transformerLM_ep{epochs}_b{batch_size}_lr{lr}_dataset_{dataset_name}"
-experiment_dir = os.path.join("training_experiments", experiment_name)
+experiment_name = f"ep{epochs}_b{batch_size}_lr{lr}_dataset_{dataset_name}_token_ch"
+experiment_dir = os.path.join(CHECKPOINT_DIR, CHECKPOINT_PREFIX, experiment_name)
 log_path = os.path.join(experiment_dir, "training_info.txt")
 
 os.makedirs(experiment_dir, exist_ok=True)
