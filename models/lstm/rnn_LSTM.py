@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import torch
 import torch.nn as nn
-from models.embedding import EmbeddingLayer
+from models.encoder_only.embedding import EmbeddingLayer
 
 class LSTM(nn.Module):
     def __init__(self, seq_len, vocab_size, embed_dim, hidden_dim):

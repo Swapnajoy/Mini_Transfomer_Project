@@ -10,7 +10,7 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 #See utils for available tokenizer options. Update experiment_name accordingly.
 from utils.ch_tokenizer import CharTokenizer
 from datasets.text_dataset import TextDataset
-from models.transformerLM import TransformerLanguageModel
+from models.encoder_only.transformerLM import TransformerLanguageModel
 
 from config import DATASET_PATH, SEQ_LEN, MODEL_CONFIG, TRAIN_CONFIG, CHECKPOINT_DIR, CHECKPOINT_PREFIX, SAVE_FREQ
 
@@ -128,7 +128,7 @@ model.eval()
 with torch.no_grad():
 
     running_loss = 0
-    for idx, (x, y) in enumerate(tqdm(val_loader)):
+    for idx, (x, y) in enumerate(val_loader):
         x = x.to(device)
         y = y.to(device)
         pred, _ = model(x)
