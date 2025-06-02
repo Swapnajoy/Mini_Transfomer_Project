@@ -5,7 +5,7 @@ import torch.nn as nn
 
 from utils.ch_tokenizer import CharTokenizer
 from models.encoder_only.transformerLM import TransformerLanguageModel
-from config import CHECKPOINT_PATH, TXT_FILE_PATH, SEQ_LEN, MODEL_CONFIG, TOPK_CONFIG
+from config_encoder_only import CHECKPOINT_PATH, TXT_FILE_PATH, SEQ_LEN, MODEL_CONFIG, TOPK_CONFIG
 
 checkpoint_path = CHECKPOINT_PATH
 txt_file_path = TXT_FILE_PATH
@@ -49,8 +49,8 @@ with torch.no_grad():
 
         probs = torch.softmax(pred_logits[0, -1, :]/temperature, dim = -1)
         topk_probs, topk_indices = torch.topk(probs, k)
-        next_token = torch.multinomial(topk_probs, 1)
-        next_token_idx = topk_indices[next_token]
+        next_token = torch.multinomial(topk_probs, 1).item()
+        next_token_idx = topk_indices[next_token].unsqueeze(0)
 
         generated_tokens.append(next_token_idx.cpu().item())
         next_token_idx = next_token_idx.to(device).unsqueeze(0)

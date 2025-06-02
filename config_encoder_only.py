@@ -33,7 +33,7 @@ TRAIN_CONFIG = {
 # =========================
 
 CHECKPOINT_DIR = "training_experiments"
-CHECKPOINT_PREFIX = "transformerLM"
+CHECKPOINT_PREFIX = "encoder_only"
 SAVE_FREQ = 3
 
 # Generator Configurations

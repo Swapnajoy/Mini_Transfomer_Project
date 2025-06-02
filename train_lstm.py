@@ -10,9 +10,9 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 #See utils for available tokenizer options. Update experiment_name accordingly.
 from utils.ch_tokenizer import CharTokenizer
 from datasets.text_dataset import TextDataset
-from models.encoder_only.transformerLM import TransformerLanguageModel
+from models.lstm.rnn_LSTM import LSTM
 
-from config import DATASET_PATH, SEQ_LEN, MODEL_CONFIG, TRAIN_CONFIG, CHECKPOINT_DIR, CHECKPOINT_PREFIX, SAVE_FREQ
+from config_lstm import DATASET_PATH, SEQ_LEN, MODEL_CONFIG, TRAIN_CONFIG, CHECKPOINT_DIR, CHECKPOINT_PREFIX, SAVE_FREQ
 
 txt_file_path = DATASET_PATH
 seq_len = SEQ_LEN
@@ -41,12 +41,11 @@ lr = TRAIN_CONFIG['lr']
 epochs = TRAIN_CONFIG['epochs']
 num_workers = TRAIN_CONFIG['num_workers']
 
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=num_workers)
+val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, drop_last=True, num_workers=num_workers)
+
 embed_dim = MODEL_CONFIG['embed_dim']
-num_heads = MODEL_CONFIG['num_heads']
 hidden_dim = MODEL_CONFIG['hidden_dim']
-enc_ffn_h_dim = MODEL_CONFIG['enc_ffn_h_dim']
-num_enc = MODEL_CONFIG['num_enc']
-use_sinusoidal = MODEL_CONFIG['use_sinusoidal']
 
 dataset_name = os.path.basename(txt_file_path)
 experiment_name = f"ep{epochs}_b{batch_size}_lr{lr}_dataset_{dataset_name}_token_ch"
@@ -55,15 +54,12 @@ log_path = os.path.join(experiment_dir, "training_info.txt")
 
 os.makedirs(experiment_dir, exist_ok=True)
 
-train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=num_workers)
-val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, drop_last=True, num_workers=num_workers)
-
 device = ('cuda' if torch.cuda.is_available() else 'cpu')
 
-model = TransformerLanguageModel(vocab_size, embed_dim, seq_len, hidden_dim, num_heads, enc_ffn_h_dim, num_enc, use_sinusoidal=use_sinusoidal).to(device)
+model = LSTM(vocab_size, embed_dim, hidden_dim).to(device)
 
 criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
+optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
 
 steps_per_epoch = len(train_loader)
 total_steps = epochs * steps_per_epoch
@@ -71,7 +67,8 @@ scheduler = CosineAnnealingLR(optimizer, T_max=total_steps)
 
 if not os.path.exists(log_path):
     with open(log_path, 'w') as f:
-        f.write("epoch,training_loss,validation_loss,perplexity\n")
+        f.write("epoch,training_loss,validation_loss, perplexity\n")
+
 
 #Training Loop
 print(f"Entering training loop")
@@ -82,7 +79,7 @@ for epoch in range(epochs):
     for idx, (x, y) in enumerate(tqdm(train_loader)):
         x = x.to(device)
         y = y.to(device)
-        pred, _ = model(x)
+        pred = model(x)
 
         optimizer.zero_grad()
         loss = criterion(pred.view(-1, vocab_size), y.view(-1))
@@ -104,7 +101,7 @@ for epoch in range(epochs):
             for idx, (x, y) in enumerate(val_loader):
                 x = x.to(device)
                 y = y.to(device)
-                pred, _ = model(x)
+                pred = model(x)
 
                 loss = criterion(pred.view(-1, vocab_size), y.view(-1))
                 
@@ -131,7 +128,7 @@ with torch.no_grad():
     for idx, (x, y) in enumerate(val_loader):
         x = x.to(device)
         y = y.to(device)
-        pred, _ = model(x)
+        pred = model(x)
 
         loss = criterion(pred.view(-1, vocab_size), y.view(-1))
         
