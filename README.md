@@ -5,7 +5,7 @@ Document the observations during:
 
   training for loss curves, overfitting, plateauing etc. Experiment with the hyperparameters.
   
-  inference, how the generated text compares with the other models.
+  inference, how the generated text compares with the other models. Generalization capability.
   
 Visualize the results
 
