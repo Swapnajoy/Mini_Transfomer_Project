@@ -20,8 +20,8 @@ MODEL_CONFIG = {
 
 TRAIN_CONFIG = {
     "batch_size" : 64,
-    "lr" : 0.0006,
-    "epochs" : 10,
+    "lr" : 0.00005,
+    "epochs" : 20,
     "num_workers" : 4,
     }
 
@@ -30,12 +30,12 @@ TRAIN_CONFIG = {
 
 CHECKPOINT_DIR = "training_experiments"
 CHECKPOINT_PREFIX = "lstm"
-SAVE_FREQ = 1
+SAVE_FREQ = 2
 
 # Generator Configurations
 # ========================
 
-CHECKPOINT_PATH = "training_experiments/lstm/ep10_b64_lr0.0006_dataset_alice_in_wonderland.txt_token_ch/model_epoch_10.pth"
+CHECKPOINT_PATH = "training_experiments/lstm/ep20_b64_lr5e-05_dataset_alice_in_wonderland.txt_token_ch/model_epoch_8.pth"
 TXT_FILE_PATH = "data/alice_in_wonderland.txt"
 
 # Top-K Sampling Configurations

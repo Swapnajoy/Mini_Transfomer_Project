@@ -113,8 +113,8 @@ for epoch in range(epochs):
         checkpoint_path = os.path.join(experiment_dir, f"model_epoch_{epoch+1}.pth")
         torch.save(model.state_dict(), checkpoint_path)
 
-        print(f"epoch : {epoch+1}, training_loss : {training_loss:.5f}, validation_loss : {val_loss:.5f}, perplexity : {perplexity:.2f}\n")
-        log_line = f"{epoch+1},{training_loss:.5f},{val_loss:.5f},{perplexity:.2f}\n"
+        print(f"epoch : {epoch+1}, training_loss : {training_loss:.5f}, validation_loss : {val_loss:.5f}, perplexity : {perplexity:.5f}\n")
+        log_line = f"{epoch+1},{training_loss:.5f},{val_loss:.5f},{perplexity:.5f}\n"
         with open(os.path.join(experiment_dir, "training_info.txt"), 'a') as f:
             f.write(log_line)
 
