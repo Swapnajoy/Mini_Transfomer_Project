@@ -1,7 +1,3 @@
-import os
-import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -11,7 +7,7 @@ from models.encoder_only.learnable_positional_encoding import LearnablePositiona
 from models.encoder_only.fixed_positional_encoding import SinusoidalPositionalEncoding
 from models.encoder_only.encoder_block import EncoderBlock
 
-class TransformerLanguageModel(nn.Module):
+class EncoderOnlyTransformer(nn.Module):
     def __init__(self, vocab_size, embed_dim, max_seq_len, hidden_dim, num_heads, enc_ffn_h_dim, num_enc, use_sinusoidal=True):
         super().__init__()
         self.embed = EmbeddingLayer(vocab_size, embed_dim)

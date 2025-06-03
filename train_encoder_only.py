@@ -10,7 +10,7 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 #See utils for available tokenizer options. Update experiment_name accordingly.
 from utils.ch_tokenizer import CharTokenizer
 from datasets.text_dataset import TextDataset
-from models.encoder_only.transformerLM import TransformerLanguageModel
+from models.encoder_only.enc_only_transformer import TransformerLanguageModel
 
 from config_encoder_only import DATASET_PATH, SEQ_LEN, MODEL_CONFIG, TRAIN_CONFIG, CHECKPOINT_DIR, CHECKPOINT_PREFIX, SAVE_FREQ
 

@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 
 from utils.ch_tokenizer import CharTokenizer
-from models.encoder_only.transformerLM import TransformerLanguageModel
+from models.encoder_only.enc_only_transformer import TransformerLanguageModel
 from config_encoder_only import CHECKPOINT_PATH, TXT_FILE_PATH, SEQ_LEN, MODEL_CONFIG, TOPK_CONFIG
 
 checkpoint_path = CHECKPOINT_PATH
