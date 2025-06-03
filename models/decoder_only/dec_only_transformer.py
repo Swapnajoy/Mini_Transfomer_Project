@@ -8,14 +8,14 @@ from models.encoder_only.fixed_positional_encoding import SinusoidalPositionalEn
 from models.decoder_only.decoder_block import DecoderBlock
 
 class DecoderOnlyTransformer(nn.Module):
-    def __init__(self, vocab_size, embed_dim, max_seq_len, hidden_dim, num_heads, dec_ffn_h_dim, num_dec, use_sinusoidal=True):
+    def __init__(self, vocab_size, embed_dim, seq_len, hidden_dim, num_heads, dec_ffn_h_dim, num_dec, use_sinusoidal=True):
         super().__init__()
         self.embed = EmbeddingLayer(vocab_size, embed_dim)
         
         if use_sinusoidal:
-            self.pe = SinusoidalPositionalEncoding(max_seq_len, embed_dim)
+            self.pe = SinusoidalPositionalEncoding(seq_len, embed_dim)
         else:
-            self.pe = LearnablePositionalEncoding(max_seq_len, embed_dim)
+            self.pe = LearnablePositionalEncoding(seq_len, embed_dim)
 
         self.decoders = nn.ModuleList([DecoderBlock(embed_dim, hidden_dim, num_heads, dec_ffn_h_dim) for _ in range(num_dec)])
         self.ln = nn.LayerNorm(embed_dim)
