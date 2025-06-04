@@ -4,8 +4,9 @@ import torch
 import torch.nn as nn
 
 from utils.ch_tokenizer import CharTokenizer
-from models.encoder_only.enc_only_transformer import EncoderOnlyTransformer
-from config_encoder_only import CHECKPOINT_PATH, TXT_FILE_PATH, SEQ_LEN, MODEL_CONFIG, TOPK_CONFIG
+from models.decoder_only.dec_only_transformer import DecoderOnlyTransformer
+
+from config_decoder_only import CHECKPOINT_PATH, TXT_FILE_PATH, SEQ_LEN, MODEL_CONFIG, TOPK_CONFIG
 
 checkpoint_path = CHECKPOINT_PATH
 txt_file_path = TXT_FILE_PATH
@@ -17,13 +18,13 @@ seq_len = SEQ_LEN
 embed_dim = MODEL_CONFIG['embed_dim']
 num_heads = MODEL_CONFIG['num_heads']
 hidden_dim = MODEL_CONFIG['hidden_dim']
-enc_ffn_h_dim = MODEL_CONFIG['enc_ffn_h_dim']
-num_enc = MODEL_CONFIG['num_enc']
+dec_ffn_h_dim = MODEL_CONFIG['dec_ffn_h_dim']
+num_dec = MODEL_CONFIG['num_dec']
 use_sinusoidal = MODEL_CONFIG['use_sinusoidal']
 
 device = ('cuda' if torch.cuda.is_available() else 'cpu')
 
-model = EncoderOnlyTransformer(vocab_size, embed_dim, seq_len, hidden_dim, num_heads, enc_ffn_h_dim, num_enc, use_sinusoidal).to(device)
+model = DecoderOnlyTransformer(vocab_size, embed_dim, seq_len, hidden_dim, num_heads, dec_ffn_h_dim, num_dec, use_sinusoidal).to(device)
 
 model.load_state_dict(torch.load(checkpoint_path))
 
