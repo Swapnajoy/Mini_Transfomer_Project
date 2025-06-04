@@ -10,7 +10,7 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 #See utils for available tokenizer options. Update experiment_name accordingly.
 from utils.ch_tokenizer import CharTokenizer
 from datasets.text_dataset import TextDataset
-from models.encoder_only.enc_only_transformer import TransformerLanguageModel
+from models.encoder_only.enc_only_transformer import EncoderOnlyTransformer
 
 from config_encoder_only import DATASET_PATH, SEQ_LEN, MODEL_CONFIG, TRAIN_CONFIG, CHECKPOINT_DIR, CHECKPOINT_PREFIX, SAVE_FREQ
 
@@ -60,7 +60,7 @@ os.makedirs(experiment_dir, exist_ok=True)
 
 device = ('cuda' if torch.cuda.is_available() else 'cpu')
 
-model = TransformerLanguageModel(vocab_size, embed_dim, seq_len, hidden_dim, num_heads, enc_ffn_h_dim, num_enc, use_sinusoidal=use_sinusoidal).to(device)
+model = EncoderOnlyTransformer(vocab_size, embed_dim, seq_len, hidden_dim, num_heads, enc_ffn_h_dim, num_enc, use_sinusoidal=use_sinusoidal).to(device)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
