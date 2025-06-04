@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import math
 
-class MultiHeadAttentionBlock(nn.Module):
+class CrossAttentionBlock(nn.Module):
     def __init__(self, embed_dim, hidden_dim, num_heads):
         super().__init__()
         self.num_heads = num_heads
