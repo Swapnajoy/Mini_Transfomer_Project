@@ -39,7 +39,7 @@ SAVE_FREQ = 1
 # Generator Configurations
 # ========================
 
-CHECKPOINT_PATH = ""
+CHECKPOINT_PATH = "training_experiments/decoder_only/ep20_b64_lr0.0002_dataset_tiny_shakespeare.txt_token_ch/model_epoch_20.pth"
 TXT_FILE_PATH = "data/tiny_shakespeare.txt"
 
 # Top-K Sampling Configurations
