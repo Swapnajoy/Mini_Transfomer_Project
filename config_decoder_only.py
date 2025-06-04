@@ -3,18 +3,18 @@ import os
 # Dataset Configurations
 # ======================
 
-DATASET_PATH = "data/alice_in_wonderland.txt"
-SEQ_LEN = 128
+DATASET_PATH = "data/tiny_shakespeare.txt"
+SEQ_LEN = 256
 
 # Model Configurations
 # ====================
 
 MODEL_CONFIG = {
-    "embed_dim" : 384,
-    "num_heads" : 6,
-    "hidden_dim" : 384,
-    "dec_ffn_h_dim" : 1536,
-    "num_dec" : 6,
+    "embed_dim" : 256,
+    "num_heads" : 4,
+    "hidden_dim" : 256,
+    "dec_ffn_h_dim" : 1024,
+    "num_dec" : 4,
     "use_sinusoidal" : True,
     "vocab_size" : None,
     }
@@ -24,9 +24,9 @@ MODEL_CONFIG = {
 
 TRAIN_CONFIG = {
     "batch_size" : 64,
-    "lr" : 0.0006,
-    "epochs" : 30,
-    "num_workers" : 4,
+    "lr" : 0.0002,
+    "epochs" : 20,
+    "num_workers" : 8,
     }
 
 # Checkpoint Configurations
@@ -34,13 +34,13 @@ TRAIN_CONFIG = {
 
 CHECKPOINT_DIR = "training_experiments"
 CHECKPOINT_PREFIX = "decoder_only"
-SAVE_FREQ = 3
+SAVE_FREQ = 1
 
 # Generator Configurations
 # ========================
 
 CHECKPOINT_PATH = ""
-TXT_FILE_PATH = "data/alice_in_wonderland.txt"
+TXT_FILE_PATH = "data/tiny_shakespeare.txt"
 
 # Top-K Sampling Configurations
 # =============================

@@ -63,7 +63,7 @@ device = ('cuda' if torch.cuda.is_available() else 'cpu')
 model = DecoderOnlyTransformer(vocab_size, embed_dim, seq_len, hidden_dim, num_heads, dec_ffn_h_dim, num_dec, use_sinusoidal=use_sinusoidal).to(device)
 
 criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
+optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
 
 steps_per_epoch = len(train_loader)
 total_steps = epochs * steps_per_epoch
