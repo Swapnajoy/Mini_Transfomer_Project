@@ -28,8 +28,11 @@ class DecoderBlockSeq2Seq(nn.Module):
         self.dp3 = nn.Dropout(p=0.2)
 
     def forward(self, x, y):
-        scores, _ = self.mmha(self.ln1(x))
+        scores, attn_wgts_self = self.mmha(self.ln1(x))
         x = x + self.dp1(scores)
-        x = x + self.dp2(self.ca(self.ln2(x), y))
+
+        cross_scores, attn_wgts_cross = self.ca(self.ln2(x))
+        x = x + self.dp2(cross_scores)
+
         out = x + self.dp3(self.ffn(self.ln3(x)))
-        return out
+        return out, (attn_wgts_self, attn_wgts_cross)
