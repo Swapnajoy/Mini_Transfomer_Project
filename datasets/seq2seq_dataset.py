@@ -4,10 +4,6 @@ from tokenizers import Tokenizer
 
 tokenizer = Tokenizer.from_file('okenizers/seq2seq_shared_tokenizer.json')
 
-with open('data/iwslt2017_en_de/train_de.txt', 'r', encoding='utf-8') as f, open('data/iwslt2017_en_de/train_en.txt', 'r', encoding='utf-8') as g:
-    de_sentences = f.readlines()
-    en_sentences = g.readlines()
-
 def encode_pair(src, tgt, tokenizer, max_seq_len=128):
     src_encoded = tokenizer.encode(src)
     tgt_encoded = tokenizer.encode(tgt)
