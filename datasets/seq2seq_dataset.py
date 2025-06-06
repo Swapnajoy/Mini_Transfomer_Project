@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import Dataset
 from tokenizers import Tokenizer
 
-tokenizer = Tokenizer.from_file('okenizers/seq2seq_shared_tokenizer.json')
+tokenizer = Tokenizer.from_file('tokenizers/seq2seq_shared_tokenizer.json')
 
 def encode_pair(src, tgt, tokenizer, max_seq_len=128):
     src_encoded = tokenizer.encode(src)
