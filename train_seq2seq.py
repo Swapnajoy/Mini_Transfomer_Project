@@ -12,7 +12,7 @@ from tokenizers import Tokenizer
 
 batch_size = 64
 lr = 0.0003
-epochs = 10
+epochs = 30
 num_workers = 4
 
 train_src_path = 'data/iwslt2017_en_de/train_de.txt'
