@@ -13,7 +13,7 @@ class CrossAttentionBlock(nn.Module):
         self.Wv = nn.Linear(embed_dim, hidden_dim)
         self.Wo = nn.Linear(hidden_dim, embed_dim)
 
-    def forward(self,x, y):
+    def forward(self, x, y):
         Q = self.Wq(x)
         K = self.Wk(y)
         V = self.Wv(y)

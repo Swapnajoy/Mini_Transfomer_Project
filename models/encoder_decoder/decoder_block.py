@@ -31,7 +31,7 @@ class DecoderBlockSeq2Seq(nn.Module):
         scores, attn_wgts_self = self.mmha(self.ln1(x))
         x = x + self.dp1(scores)
 
-        cross_scores, attn_wgts_cross = self.ca(self.ln2(x))
+        cross_scores, attn_wgts_cross = self.ca(self.ln2(x), y)
         x = x + self.dp2(cross_scores)
 
         out = x + self.dp3(self.ffn(self.ln3(x)))
