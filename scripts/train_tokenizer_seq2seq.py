@@ -1,7 +1,6 @@
 from tokenizers import Tokenizer
 from tokenizers.models import BPE
 from tokenizers.trainers import BpeTrainer
-from tokenizers.pre_tokenizers import Whitespace
 from tokenizers.normalizers import NFKC
 from tokenizers.processors import TemplateProcessing
 from tokenizers import normalizers, pre_tokenizers
