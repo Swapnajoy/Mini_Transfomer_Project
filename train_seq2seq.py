@@ -2,7 +2,7 @@ import os
 
 import torch
 import torch.nn as nn
-import tqdm
+from tqdm import tqdm
 
 from datasets.seq2seq_dataset import Seq2SeqDataset
 from models.encoder_decoder.transformer_seq2seq import TransformerSeq2Seq
