@@ -94,7 +94,7 @@ for epoch in range(epochs):
         tgt = item['tgt'].to(device)
         label = item['label'].to(device)
 
-        pred, _ = model(src, tgt)
+        pred, _, _ = model(src, tgt)
 
         optimizer.zero_grad()
 
@@ -121,7 +121,7 @@ for epoch in range(epochs):
                 tgt = item['tgt'].to(device)
                 label = item['label'].to(device)
 
-                pred, _ = model(src, tgt)
+                pred, _, _ = model(src, tgt)
 
                 loss = criterion(pred.view(-1, vocab_size), label.view(-1))
                 
@@ -151,7 +151,7 @@ with torch.no_grad():
         tgt = item['tgt'].to(device)
         label = item['label'].to(device)
 
-        pred, _ = model(src, tgt)
+        pred, _, _ = model(src, tgt)
 
         loss = criterion(pred.view(-1, vocab_size), label.view(-1))
                 
