@@ -6,7 +6,7 @@ from models.encoder_only.embedding import EmbeddingLayer
 from models.encoder_only.learnable_positional_encoding import LearnablePositionalEncoding
 from models.encoder_only.fixed_positional_encoding import SinusoidalPositionalEncoding
 from models.encoder_only.encoder_block import EncoderBlock
-from models.encoder_decoder.decoder_block import DecoderBlock
+from models.encoder_decoder.decoder_block import DecoderBlockSeq2Seq
 
 class TransformerSeq2Seq(nn.Module):
     def __init__(self, vocab_size, embed_dim, seq_len, hidden_dim, num_heads, enc_ffn_h_dim, dec_ffn_h_dim, num_enc, num_dec, use_sinusoidal=True):
@@ -18,8 +18,8 @@ class TransformerSeq2Seq(nn.Module):
         else:
             self.pe = LearnablePositionalEncoding(seq_len, embed_dim)
 
-        self.encoders = nn.ModuleList([EncoderBlock(embed_dim, hidden_dim, num_heads, dec_ffn_h_dim) for _ in range(num_enc)])
-        self.decoders = nn.ModuleList([DecoderBlock(embed_dim, hidden_dim, num_heads, dec_ffn_h_dim) for _ in range(num_dec)])
+        self.encoders = nn.ModuleList([EncoderBlock(embed_dim, hidden_dim, num_heads, enc_ffn_h_dim) for _ in range(num_enc)])
+        self.decoders = nn.ModuleList([DecoderBlockSeq2Seq(embed_dim, hidden_dim, num_heads, dec_ffn_h_dim) for _ in range(num_dec)])
         
         self.ln = nn.LayerNorm(embed_dim)
         self.ffn = nn.Linear(embed_dim, vocab_size)
