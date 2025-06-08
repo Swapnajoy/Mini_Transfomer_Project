@@ -1,13 +1,15 @@
 # 📌 Overview
-This project explores the architecture, training and inference of large language models from scratch using PyTorch. It also focusses on the LSTM architecture from the pre-transfomre era for comparison. The following have been covered:
+This project explores the architecture, training, and inference of large language models from scratch using PyTorch. It also revisits the LSTM architecture from the pre-transformer era to provide historical and performance-based comparison.
 
-Encoder-only models (e.g., BERT-style)
+The following model types are implemented and analyzed:
 
-Decoder-only models (e.g., GPT-style)
+Encoder-only Transformers (e.g., BERT-style)
 
-Full Seq2Seq models (Transformer-based translation)
+Decoder-only Transformers (e.g., GPT-style)
 
-Baseline RNN model using LSTMs
+Full Seq2Seq Transformers (e.g., for machine translation)
+
+Baseline RNN model using LSTM
 
 Document the observations during:
 
