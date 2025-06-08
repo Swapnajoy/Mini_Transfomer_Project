@@ -1,5 +1,6 @@
 # 📌 Overview
 This project explores the architecture, training and inference of large language models from scratch using PyTorch. It also focusses on the LSTM architecture from the pre-transfomre era for comparison. The following have been covered:
+
 Encoder-only models (e.g., BERT-style)
 
 Decoder-only models (e.g., GPT-style)
