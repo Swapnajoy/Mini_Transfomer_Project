@@ -1,4 +1,4 @@
-# Mini_Transfomer_Project
+# 📌 Overview
 Study different model architectures for processing sequential data and compare their results. The models are coded from scratch using PyTorch.
 
 Document the observations during:
