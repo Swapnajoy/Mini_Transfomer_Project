@@ -1,5 +1,12 @@
 # 📌 Overview
-Study different model architectures for processing sequential data and compare their results. The models are coded from scratch using PyTorch.
+This project explores the architecture, training and inference of large language models from scratch using PyTorch. It also focusses on the LSTM architecture from the pre-transfomre era for comparison. The following have been covered:
+Encoder-only models (e.g., BERT-style)
+
+Decoder-only models (e.g., GPT-style)
+
+Full Seq2Seq models (Transformer-based translation)
+
+Baseline RNN model using LSTMs
 
 Document the observations during:
 
