@@ -31,6 +31,28 @@ To evaluate and compare various model architectures, the following datasets were
     - Use Case: Designed for benchmarking machine translation models.
     - Applied in: Seq2Seq Transformer with shared Byte-Pair Encoding (BPE) tokenizer.
 
+# 🧩 Tokenization Strategies
+Tokenization plays a crucial role in how language models process and understand text. This project experiments with multiple tokenization schemes to analyze their effect on model performance and generalization.
+
+1. Character-Level Tokenizer
+    - Type: Custom, from-scratch implementation -> `utils/ch_tokenizer.py`.
+    - Vocabulary: All unique characters from the dataset.
+    - Pros: Simple to implement and captures fine-grained detail.
+    - Cons: Longer sequences and lower convergence due to sparse signal.
+
+2. Word-Level Tokenizer (Custom)
+    - Type: Custom tokenizer splitting on whitespace and punctuation -> `utils/word_tokeinizer.py`
+    - Vocabulary: Built manually from training corpus.
+    - Pros: More semantic understanding than character-level and faster convergence.
+    - Cons: Vocabulary explosion with rare or compound words and poor generalization to unseen words.
+
+3. Byte-Pair Encoding (BPE)
+    - Type: Subword-level tokenizer using HuggingFace's tokenizers library.
+    - Shared Vocabulary: Trained on combined English-German corpus from IWSLT2017.
+    - Training script `scripts/train_tokenizer_seq2seq.py`.
+    - Trained tokenizer `tokenizers/seq2seq_shared_tokenizer.json`.
+    - Pros: Handles rare words and morphology gracefully, vocabulary size can be tuned and suitable for multilingual tasks.
+    - Cons: Slightly more complex setup.
 
 
 Document the observations during:
