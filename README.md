@@ -12,7 +12,7 @@ The following model types are implemented and analyzed:
 * Baseline RNN model using LSTM
 
 # 📚 Datasets Used
-All datasets used in this project are stored in the 'data/' folder.
+All datasets used in this project are stored in the `data/` folder.
 To evaluate and compare various model architectures, the following datasets were employed:
 
 1. Tiny Shakespeare
