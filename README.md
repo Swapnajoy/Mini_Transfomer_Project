@@ -57,15 +57,17 @@ Tokenization plays a crucial role in how language models process and understand 
 # 📦 Dataset Classes
 Custom PyTorch Dataset classes were implemented to efficiently handle training samples for different model-tokenizer combinations.
 
-1. TextDataset – for Character/Word Tokenizers
+1. `TextDataset` – for Character/Word Tokenizers
     - Used with: Character-level and word-level tokenizers.
     - Purpose: Prepares fixed-length input (x) and target (y) sequences for next-token prediction.
     - Mechanism: For each sample, `x = tokens[i : i+seq_len], y = tokens[i+1 : i+1+seq_len]`
     - Output: (x, y) as integer token sequences.
 
-
-2. Seq2SeqDataset – for BPE-based Translation
-
+2. `Seq2SeqDataset` – for BPE-based Translation
+    - Used with: BPE tokenizer (`seq2seq_shared_tokenizer.json`)
+    - Purpose: Prepares padded input-output sentence pairs for Seq2Seq translation tasks.
+    - Mechanism: Tokenizes and pads both `src` and `tgt` sequences and generatesencoder input, decoder input with `[BOS]` and decoder target (right shifted).
+    - Output: Dictionary with `src`, `tgt`, and `label` tensors.
 
 Document the observations during:
 
