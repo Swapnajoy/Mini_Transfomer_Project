@@ -54,6 +54,13 @@ Tokenization plays a crucial role in how language models process and understand 
     - Pros: Handles rare words and morphology gracefully, vocabulary size can be tuned and suitable for multilingual tasks.
     - Cons: Slightly more complex setup.
 
+# 📦 Dataset Classes
+Custom PyTorch Dataset classes were implemented to efficiently handle training samples for different model-tokenizer combinations.
+
+1. TextDataset – for Character/Word Tokenizers
+
+2. Seq2SeqDataset – for BPE-based Translation
+
 
 Document the observations during:
 
