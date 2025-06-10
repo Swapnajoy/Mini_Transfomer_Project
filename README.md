@@ -69,7 +69,7 @@ Custom PyTorch `Dataset` classes were implemented to efficiently handle training
     - Mechanism: Tokenizes and pads both `src` and `tgt` sequences and generatesencoder input, decoder input with `[BOS]` and decoder target (right shifted).
     - Output: Dictionary with `src`, `tgt`, and `label` tensors.
 
-Document the observations during:
+Document:
 
   training for loss curves, overfitting, plateauing etc. Experiment with the hyperparameters.
   
@@ -77,6 +77,6 @@ Document the observations during:
   
 Visualize the results
 
-Finally build a mini transformer based language model.
+Finally build a mini transformer based language model
 
 In Progress
