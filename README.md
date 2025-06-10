@@ -55,7 +55,7 @@ Tokenization plays a crucial role in how language models process and understand 
     - Cons: Slightly more complex setup.
 
 # 📦 Dataset Classes
-Custom PyTorch Dataset classes were implemented to efficiently handle training samples for different model-tokenizer combinations.
+Custom PyTorch `Dataset` classes were implemented to efficiently handle training samples for different model-tokenizer combinations.
 
 1. `TextDataset` – for Character/Word Tokenizers
     - Used with: Character-level and word-level tokenizers.
