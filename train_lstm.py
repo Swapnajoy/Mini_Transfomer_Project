@@ -12,15 +12,17 @@ from utils.ch_tokenizer import CharTokenizer
 from datasets.text_dataset import TextDataset
 from models.lstm.rnn_LSTM import LSTM
 
-from config_lstm import DATASET_PATH, SEQ_LEN, MODEL_CONFIG, TRAIN_CONFIG, CHECKPOINT_DIR, CHECKPOINT_PREFIX, SAVE_FREQ
+from config_lstm import TXT_FILE_PATH, TOKENIZER_PATH, SEQ_LEN, MODEL_CONFIG, TRAIN_CONFIG, CHECKPOINT_DIR, CHECKPOINT_PREFIX, SAVE_FREQ
 
-txt_file_path = DATASET_PATH
+txt_file_path = TXT_FILE_PATH
+tokenizer_path = TOKENIZER_PATH
 seq_len = SEQ_LEN
 
-tokenizer = CharTokenizer(txt_file_path)
+tokenizer = CharTokenizer.load(tokenizer_path)
 vocab_size = tokenizer.vocab_size
 MODEL_CONFIG['vocab_size'] = vocab_size
 
+print(f"Tokenizer loaded from: {tokenizer_path}")
 print(f"Dataset used:{txt_file_path.split('/')[-1]}, Vocab Size:{vocab_size}")
 
 with open(txt_file_path, 'r', encoding='utf-8') as f:
