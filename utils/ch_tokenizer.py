@@ -34,7 +34,7 @@ class CharTokenizer:
         with open(file_path, 'r', encoding='utf-8') as f:
             tokenizer_dict = json.load(f)
 
-        obj = cls()
+        obj = cls(text="")
         obj.vocab = tokenizer_dict['vocab']
         obj.stoi = tokenizer_dict['char2idx']
         obj.itos = {i: ch for ch, i in obj.stoi.items()}
