@@ -4,7 +4,7 @@ import os
 # ======================
 
 DATASET_PATH = "data/alice_in_wonderland.txt"
-SEQ_LEN = 128
+SEQ_LEN = 64
 
 # Model Configurations
 # ====================
@@ -30,14 +30,14 @@ TRAIN_CONFIG = {
 
 CHECKPOINT_DIR = "training_experiments"
 CHECKPOINT_PREFIX = "lstm"
-SAVE_FREQ = 2
+SAVE_FREQ = 1
 
 # Generator Configurations
 # ========================
 
 CHECKPOINT_PATH = "training_experiments/lstm/ep20_b64_lr5e-05_dataset_alice_in_wonderland.txt_token_ch/model_epoch_8.pth"
 TXT_FILE_PATH = "data/alice_in_wonderland.txt"
-TOKENIZER_PATH = "tokenizers/alice_ch_tokenizer.json"
+TOKENIZER_PATH = "tokenizers/alice_word_tokenizer.json"
 
 # Top-K Sampling Configurations
 # =============================

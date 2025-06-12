@@ -9,17 +9,17 @@ from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import CosineAnnealingLR
 
 #See utils for available tokenizer options. Update experiment_name accordingly.
-from utils.ch_tokenizer import CharTokenizer
+from utils.word_tokeinizer import WordTokenizer
 from datasets.text_dataset import TextDataset
 from models.lstm.rnn_LSTM import LSTM
 
-from config_lstm import TXT_FILE_PATH, TOKENIZER_PATH, SEQ_LEN, MODEL_CONFIG, TRAIN_CONFIG, CHECKPOINT_DIR, CHECKPOINT_PREFIX, SAVE_FREQ
+from config_lstm import DATASET_PATH, TOKENIZER_PATH, SEQ_LEN, MODEL_CONFIG, TRAIN_CONFIG, CHECKPOINT_DIR, CHECKPOINT_PREFIX, SAVE_FREQ
 
-txt_file_path = TXT_FILE_PATH
+txt_file_path = DATASET_PATH
 tokenizer_path = TOKENIZER_PATH
 seq_len = SEQ_LEN
 
-tokenizer = CharTokenizer.load(tokenizer_path)
+tokenizer = WordTokenizer.load(tokenizer_path)
 vocab_size = tokenizer.vocab_size
 MODEL_CONFIG['vocab_size'] = vocab_size
 
@@ -52,7 +52,7 @@ hidden_dim = MODEL_CONFIG['hidden_dim']
 
 timestamp = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 dataset_name = os.path.basename(txt_file_path)
-experiment_name = f"ep{epochs}_b{batch_size}_lr{lr}_dataset_{dataset_name}_token_ch_{timestamp}"
+experiment_name = f"ep{epochs}_b{batch_size}_lr{lr}_dataset_{dataset_name}_token_word_{timestamp}"
 experiment_dir = os.path.join(CHECKPOINT_DIR, CHECKPOINT_PREFIX, experiment_name)
 log_path = os.path.join(experiment_dir, "training_info.txt")
 
