@@ -1,3 +1,5 @@
+import json
+
 class CharTokenizer:
     def __init__(self, file_path=None, text=None):
         #requires either file_path or text
@@ -17,6 +19,26 @@ class CharTokenizer:
 
     def decode(self, indices: list[int]) -> str:
         return ''.join([self.itos[i] for i in indices])
+    
+    def save(self, file_path):
+        tokenizer_dict = {
+            "vocab": self.vocab,
+            "char2idx": self.stoi
+        }
+
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(tokenizer_dict, f, ensure_ascii=False, indent=2)
+
+    @classmethod
+    def load(cls, file_path):
+        with open(file_path, 'r', encoding='utf-8') as f:
+            tokenizer_dict = json.load(f)
+
+        obj = cls()
+        obj.vocab = tokenizer_dict['vocab']
+        obj.stoi = tokenizer_dict['char2idx']
+        obj.itos = {i: ch for ch, i in obj.stoi.items()}
+        return obj
     
     @property
     def vocab_size(self):
