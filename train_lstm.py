@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 from tqdm import tqdm
 
@@ -49,8 +50,9 @@ val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, drop_
 embed_dim = MODEL_CONFIG['embed_dim']
 hidden_dim = MODEL_CONFIG['hidden_dim']
 
+timestamp = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 dataset_name = os.path.basename(txt_file_path)
-experiment_name = f"ep{epochs}_b{batch_size}_lr{lr}_dataset_{dataset_name}_token_ch"
+experiment_name = f"ep{epochs}_b{batch_size}_lr{lr}_dataset_{dataset_name}_token_ch_{timestamp}"
 experiment_dir = os.path.join(CHECKPOINT_DIR, CHECKPOINT_PREFIX, experiment_name)
 log_path = os.path.join(experiment_dir, "training_info.txt")
 
