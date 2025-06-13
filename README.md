@@ -69,6 +69,21 @@ Custom PyTorch `Dataset` classes were implemented to efficiently handle training
     - Mechanism: Tokenizes and pads both `src` and `tgt` sequences and generatesencoder input, decoder input with `[BOS]` and decoder target (right shifted).
     - Output: Dictionary with `src`, `tgt`, and `label` tensors.
 
+# 🧠 LSTM Model (Pre-Transformer Baseline)
+The baseline recurrent architecture is implemented in `models/lstm/rnn_LSTM.py`, with training handled via `train_lstm.py` and configurations specified in `config_lstm.py`. Inference or generation from trained checkpoints can be tested using the `generator/lstm_generator.py` script.
+
+Initial experiments were conducted using the Alice in Wonderland dataset with a character-level tokenizer. Without any learning rate scheduling or regularization, signs of overfitting began as early as the first or second epoch. Particularly, when seed prompts were taken directly from the dataset, the generated outputs reproduced the training text almost verbatim. Even when the seed was a random phrase, the generation quickly collapsed into sequences memorized from the dataset, highlighting a severe lack of generalization.
+
+To mitigate this, a lower learning rate and a cosine annealing scheduler were introduced. With this adjusted configuration, the training and validation losses began to diverge only after 7–8 epochs, showing a more realistic training pattern before overfitting set in. A sample loss curve is included in the notebook and visualized below:
+
+The same LSTM model was also tested with a word-level tokenizer trained on the same dataset. Although it showed faster convergence, the generalization issues remained, particularly when the vocabulary was large or rarely occurring tokens were frequent.
+
+<p align="center">
+  <img src="assets/lstm_loss_curves.png" alt="LSTM Loss Curve" width="500"/>
+</p>
+
+
+
 Document:
 
   training for loss curves, overfitting, plateauing etc. Experiment with the hyperparameters.
