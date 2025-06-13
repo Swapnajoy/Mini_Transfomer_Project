@@ -79,7 +79,7 @@ To mitigate this, a lower learning rate and a cosine annealing scheduler were in
 The same LSTM model was also tested with a word-level tokenizer trained on the same dataset. Although it showed faster convergence, the generalization issues remained, particularly when the vocabulary was large or rarely occurring tokens were frequent.
 
 <p align="center">
-  <img src="assets/lstm_loss_curves.png" alt="LSTM Loss Curve" width="500"/>
+  <img src="Assets/lstm_loss_curves.png" alt="LSTM Loss Curve" width="500"/>
 </p>
 
 
