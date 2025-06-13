@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import CosineAnnealingLR
 
 #See utils for available tokenizer options. Update experiment_name accordingly.
-from utils.word_tokeinizer import WordTokenizer
+from utils.ch_tokenizer import CharTokenizer
 from datasets.text_dataset import TextDataset
 from models.lstm.rnn_LSTM import LSTM
 
@@ -19,7 +19,7 @@ txt_file_path = DATASET_PATH
 tokenizer_path = TOKENIZER_PATH
 seq_len = SEQ_LEN
 
-tokenizer = WordTokenizer.load(tokenizer_path)
+tokenizer = CharTokenizer.load(tokenizer_path)
 vocab_size = tokenizer.vocab_size
 MODEL_CONFIG['vocab_size'] = vocab_size
 

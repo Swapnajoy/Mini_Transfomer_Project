@@ -3,7 +3,7 @@ import os
 # Dataset Configurations
 # ======================
 
-DATASET_PATH = "data/alice_in_wonderland.txt"
+DATASET_PATH = "data/tiny_shakespeare.txt"
 SEQ_LEN = 64
 
 # Model Configurations
@@ -36,8 +36,8 @@ SAVE_FREQ = 1
 # ========================
 
 CHECKPOINT_PATH = "training_experiments/lstm/ep20_b64_lr5e-05_dataset_alice_in_wonderland.txt_token_ch/model_epoch_8.pth"
-TXT_FILE_PATH = "data/alice_in_wonderland.txt"
-TOKENIZER_PATH = "tokenizers/alice_word_tokenizer.json"
+TXT_FILE_PATH = "data/tiny_shakespeare.txt"
+TOKENIZER_PATH = "tokenizers/shakespeare_ch_tokenizer.json"
 
 # Top-K Sampling Configurations
 # =============================
