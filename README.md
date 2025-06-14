@@ -91,6 +91,15 @@ Unlike LSTM models that process inputs sequentially, encoder-only transformers o
   <img src="Assets\Encoder_only_block_diagram.png" alt="LSTM Loss Curve" width="200"/>
 </p>
 
+The self-attention block plays a crucial role here: it helps the model decide "where to look" when processing a token. By splitting into multiple attention heads, the model can learn various types of relationships (e.g., syntactic vs. semantic) simultaneously across different subspaces. These are later merged and passed through residual and feedforward layers to form rich contextual embeddings for each token.
+
+Training behavior was stable and showed no signs of overfitting in early experiments. A typical training vs. validation loss curve is shown below:
+
+
+Additionally, attention weight visualizations revealed that earlier layers focus broadly while deeper layers begin to localize attention more precisely, indicating the model's ability to capture both global and contextual semantics.
+
+
+When it comes to generalization, the encoder-only model outperformed LSTMs. On both datasets (Tiny Shakespeare and Alice in Wonderland), the generated sequences retained the stylistic flavor of the original corpus — such as sentence structure and vocabulary — but without directly copying specific sequences. This contrasts sharply with LSTMs, where outputs often became memorized reproductions of the training text, especially when seeded with familiar phrases. The transformer-based model demonstrated more creative recombination of learned patterns, indicating a better understanding of underlying language semantics rather than simple memorization.
 
 Document:
 
