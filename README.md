@@ -102,7 +102,7 @@ Training behavior was stable and showed no signs of overfitting in early experim
 In the earlier layers, attention heads exhibit strong diagonals — a clear indication that the model is primarily attending to each token itself or immediate neighbors. This behavior is expected in early stages, as the model hasn't yet learned meaningful contextual relationships and defaults to identity-like attention for stability. However, in the deeper layers, the attention becomes noticeably more diffuse and asymmetric. The diagonals weaken, and we begin to see off-diagonal activations that reflect the model's growing ability to attend to semantically or syntactically relevant tokens elsewhere in the sequence.
 
 <p align="center">
-  <img src="Assets/Encoder_only_attention_weights_heatmaps.png" alt="Attention weights" width="600"/>
+  <img src="Assets/Encoder_only_attention_weights_heatmaps.png" alt="Attention weights" width="800"/>
 </p>
 
 The visualized attention heads in Layer 6, for instance, show non-trivial attention to non-adjacent tokens, suggesting the model has learned to selectively emphasize information beyond immediate token neighbors
