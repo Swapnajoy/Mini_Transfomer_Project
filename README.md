@@ -82,6 +82,14 @@ The same LSTM model was also tested with a word-level tokenizer trained on the s
   <img src="Assets/lstm_loss_curves.png" alt="LSTM Loss Curve" width="500"/>
 </p>
 
+# 🧠 Encoder-Only Transformer (BERT-style)
+This model is based purely on a stack of self-attention-based encoder blocks and is implemented in `models/encoder_only/encoder_only_transformer.py`. The training logic resides in `train_encoder_only.py`, with hyperparameters defined in `config_encoder_only.py`. Generation from trained checkpoints can be tested using `generator/encoder_only_generator.py`.
+
+Unlike LSTM models that process inputs sequentially, encoder-only transformers operate on the entire input sequence in parallel. Each token is embedded and enriched with positional encodings, then passed through multiple layers of multi-head self-attention and feedforward blocks. The attention mechanism allows each token to focus on other relevant tokens in the sequence, enabling the model to learn dependencies and semantic relationships irrespective of their positions. Below is a schematic of the encoder-only transformer architecture. After the stack of encoders one fully connected layer was added to map into the dimension of vocab_size, which finally generates the logits.
+
+<p align="center">
+  <img src="Assets\Encoder_only_block_diagram.png" alt="LSTM Loss Curve" width="200"/>
+</p>
 
 
 Document:
