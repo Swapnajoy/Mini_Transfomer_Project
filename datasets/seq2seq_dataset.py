@@ -9,8 +9,11 @@ def encode_pair(src, tgt, tokenizer, max_seq_len=128):
     tgt_encoded = tokenizer.encode(tgt)
 
     src_ids = src_encoded.ids[:max_seq_len]
-    tgt_ids = tgt_encoded.ids[:max_seq_len]
+    tgt_ids = tgt_encoded.ids[:max_seq_len-1]
     
+    eos_id = tokenizer.token_to_id('[EOS]')
+    tgt_ids.append(eos_id)
+
     return src_ids, tgt_ids
 
 class Seq2SeqDataset(Dataset):
@@ -19,7 +22,11 @@ class Seq2SeqDataset(Dataset):
         self.tgt_list = tgt_list
         self.tokenizer = tokenizer
         self.max_seq_len = max_seq_len
+        
         self.pad_id = tokenizer.token_to_id('[PAD]')
+        self.bos_id = tokenizer.token_to_id('[BOS]')
+        self.eos_id = tokenizer.token_to_id('[EOS]')
+
 
     def __len__(self):
         return len(self.src_list)
@@ -30,7 +37,7 @@ class Seq2SeqDataset(Dataset):
         src_ids += [self.pad_id] * (self.max_seq_len - len(src_ids))
         tgt_ids += [self.pad_id] * (self.max_seq_len - len(tgt_ids))
 
-        dec_in = [self.tokenizer.token_to_id('[BOS]')] + tgt_ids[:-1]
+        dec_in = [self.bos_id] + tgt_ids[:-1]
         dec_tgt = tgt_ids
 
         return{
