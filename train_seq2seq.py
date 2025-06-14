@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 import torch
 import torch.nn as nn
@@ -21,6 +22,9 @@ val_src_path = 'data/iwslt2017_en_de/val_de.txt'
 val_tgt_path = 'data/iwslt2017_en_de/val_en.txt'
 
 tokenizer = Tokenizer.from_file('tokenizers/seq2seq_shared_tokenizer.json')
+
+eos_id = tokenizer.token_to_id('[EOS]')
+print(f"[EOS] token ID: {eos_id}")
 
 with open(train_src_path, 'r', encoding='utf-8') as f, open(train_tgt_path, 'r', encoding='utf-8') as g:
     de_sentences = f.readlines()
@@ -64,7 +68,13 @@ model = TransformerSeq2Seq(vocab_size=vocab_size,
                            use_sinusoidal=use_sinusoidal
                            ).to(device)
 
-criterion = nn.CrossEntropyLoss()
+
+token_weights = torch.ones(vocab_size)
+token_weights[eos_id] = 2
+
+label_smoothing = 0.1
+
+criterion = nn.CrossEntropyLoss(weight=token_weights, label_smoothing=label_smoothing)
 optimizer = torch.optim.AdamW(model.parameters(), weight_decay=1e-4)
 scheduler = CosineAnnealingLR(optimizer=optimizer, T_max=max_steps)
 
@@ -73,7 +83,9 @@ CHECKPOINT_PREFIX = 'seq2seq'
 dataset_name = 'iwslt2017_en_de'
 SAVE_FREQ = 1
 
-experiment_name = f"ep{epochs}_b{batch_size}_lr{lr}_dataset_{dataset_name}_token_ch"
+timestamp = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+
+experiment_name = f"ep{epochs}_b{batch_size}_lr{lr}_dataset_{dataset_name}_token_bpe_{timestamp}"
 experiment_dir = os.path.join(CHECKPOINT_DIR, CHECKPOINT_PREFIX, experiment_name)
 log_path = os.path.join(experiment_dir, "training_info.txt")
 
@@ -101,6 +113,8 @@ for epoch in range(epochs):
         loss = criterion(pred.view(-1, vocab_size), label.view(-1))
 
         loss.backward()
+
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
 
         optimizer.step()
         scheduler.step()
