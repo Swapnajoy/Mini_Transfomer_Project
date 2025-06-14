@@ -112,7 +112,7 @@ The same LSTM model was also tested with a word-level tokenizer trained on the s
 # 🧠 Encoder-Only Transformer (BERT-style)
 This model is based purely on a stack of self-attention-based encoder blocks and is implemented in `models/encoder_only/encoder_only_transformer.py`. The training logic resides in `train_encoder_only.py`, with hyperparameters defined in `config_encoder_only.py`. Generation from trained checkpoints can be tested using `generator/encoder_only_generator.py`.
 
-Unlike LSTM models that process inputs sequentially, encoder-only transformers operate on the entire input sequence in parallel. Each token is embedded and enriched with positional encodings, then passed through multiple layers of multi-head self-attention and feedforward blocks. The attention mechanism allows each token to focus on other relevant tokens in the sequence, enabling the model to learn dependencies and semantic relationships irrespective of their positions. Below is a schematic of the encoder-only transformer architecture. After the stack of encoders one fully connected layer was added to map into the dimension of vocab_size, which finally generates the logits.
+Unlike LSTM models that process inputs sequentially, encoder-only transformers operate on the entire input sequence in parallel. Each token is embedded and enriched with positional encodings, then passed through multiple layers of multi-head self-attention and feedforward blocks. The attention mechanism allows each token to focus on other relevant tokens in the sequence, enabling the model to learn dependencies and semantic relationships irrespective of their positions. Below is a schematic of the encoder-only transformer architecture. One small difference in the implementation is the use of layer-norm blocks before the attention block and the feedforward block and not after. After the stack of encoders one fully connected layer was added to map into the dimension of vocab_size, which finally generates the logits.
 
 <p align="center">
   <img src="Assets\Encoder_only_block_diagram.png" alt="Encoder-only Block Diagram" width="200"/>
@@ -135,3 +135,28 @@ In the earlier layers, attention heads exhibit strong diagonals — a clear indi
 The visualized attention heads in Layer 6, for instance, show non-trivial attention to non-adjacent tokens, suggesting the model has learned to selectively emphasize information beyond immediate token neighbors
 
 When it comes to generalization, the encoder-only model outperformed LSTMs. On both datasets (Tiny Shakespeare and Alice in Wonderland), the generated sequences retained the stylistic flavor of the original corpus — such as sentence structure and vocabulary — but without directly copying specific sequences. This contrasts sharply with LSTMs, where outputs often became memorized reproductions of the training text, especially when seeded with familiar phrases. The transformer-based model demonstrated more creative recombination of learned patterns, indicating a better understanding of underlying language semantics rather than simple memorization.
+
+# 🧠 Decoder-Only Transformer (GPT-style)
+The decoder-only transformer model is implemented in `models/decoder_only/decoder_only_transformer.py`. The training logic is handled by `train_decoder_only.py`, with configuration defined in `config_decoder_only.py`. Text generation is carried out using `generator/decoder_only_generator.py`.
+
+This architecture is based solely on decoder blocks, each containing masked multi-head self-attention followed by feedforward layers and residual connections. Unlike encoder-only models that process the full sequence in parallel, the decoder-only model predicts the next token given only the previous ones, making it inherently autoregressive and suitable for generation tasks.
+
+<p align="center">
+  <img src="Assets\Decoder_only_block_diagram.png" alt="Decoder-only Block Diagram" width="200"/>
+</p>
+
+A key component of the decoder block is masked attention. During training, each token can only attend to earlier tokens in the sequence, preventing it from "seeing the future." This is achieved through an upper triangular attention mask that zeros out the upper diagonal of the attention matrix — as clearly visible in the attention heatmaps below. Each attention head learns different aspects of context from previously seen tokens, and the masking enforces strict causal flow from left to right.
+
+Despite its simplicity in concept, the decoder-only transformer proved to be the most difficult to train. Initial experiments without learning rate scheduling led to exploding validation losses and unstable convergence. After careful tuning of the learning rate and integrating a cosine annealing scheduler, the training stabilized — though validation loss still plateaus after several epochs. This is visualized in the following training curve:
+
+<p align="center">
+  <img src="Assets/Decoder_only_loss_curves.png" alt="Decoder-only Loss Curves" width="600" height="500"/>
+</p>
+
+And the multi-head attention heatmaps from a trained model demonstrate how each head focuses progressively on past tokens while strictly avoiding future positions (upper triangle):
+
+<p align="center">
+  <img src="Assets/Decoder_only_attention_weights_heatmaps.png" alt="Attention weights" width="800"/>
+</p>
+
+This model generalizes decently, and generated sequences reflect the training data’s language style — but still show occasional instability or repetition in longer generations, especially if trained too long or on a small dataset.
