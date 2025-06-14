@@ -13,8 +13,9 @@ from tokenizers import Tokenizer
 
 batch_size = 64
 lr = 0.0003
-epochs = 30
+epochs = 40
 num_workers = 4
+seq_len = 64
 
 train_src_path = 'data/iwslt2017_en_de/train_de.txt'
 train_tgt_path = 'data/iwslt2017_en_de/train_en.txt'
@@ -27,14 +28,14 @@ with open(train_src_path, 'r', encoding='utf-8') as f, open(train_tgt_path, 'r',
     de_sentences = f.readlines()
     en_sentences = g.readlines()
 
-train_dataset = Seq2SeqDataset(de_sentences, en_sentences, tokenizer, max_seq_len=128)
+train_dataset = Seq2SeqDataset(de_sentences, en_sentences, tokenizer, max_seq_len=seq_len)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
 with open(val_src_path, 'r', encoding='utf-8') as f, open(val_tgt_path, 'r', encoding='utf-8') as g:
     de_sentences = f.readlines()
     en_sentences = g.readlines()
 
-val_dataset = Seq2SeqDataset(de_sentences, en_sentences, tokenizer, max_seq_len=128)
+val_dataset = Seq2SeqDataset(de_sentences, en_sentences, tokenizer, max_seq_len=seq_len)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 device = ('cuda' if torch.cuda.is_available() else 'cpu')
@@ -44,7 +45,6 @@ max_steps = epochs * steps_per_epoch
 
 vocab_size = tokenizer.get_vocab_size()
 embed_dim = 256
-seq_len = 128
 hidden_dim = 256
 num_heads = 4
 enc_ffn_h_dim = 1024
@@ -67,12 +67,14 @@ model = TransformerSeq2Seq(vocab_size=vocab_size,
 
 
 eos_id = tokenizer.token_to_id('[EOS]')
+pad_id = tokenizer.token_to_id('[PAD]')
 token_weights = torch.ones(vocab_size).to(device)
-token_weights[eos_id] = 2
+token_weights[eos_id] = 2.0
+token_weights[eos_id] = 0.0
 
 label_smoothing = 0.1
 
-criterion = nn.CrossEntropyLoss(weight=token_weights, label_smoothing=label_smoothing)
+criterion = nn.CrossEntropyLoss(weight=token_weights, label_smoothing=label_smoothing, reduction='none')
 optimizer = torch.optim.AdamW(model.parameters(), weight_decay=1e-4)
 scheduler = CosineAnnealingLR(optimizer=optimizer, T_max=max_steps)
 
@@ -98,6 +100,8 @@ print(f"Entering training loop")
 for epoch in range(epochs):
     model.train()
     running_loss = 0
+    eos_correct = 0
+    eos_total = 0
 
     for item in tqdm(train_loader):
         src = item['src'].to(device)
@@ -108,26 +112,50 @@ for epoch in range(epochs):
 
         optimizer.zero_grad()
 
-        loss = criterion(pred.view(-1, vocab_size), label.view(-1))
+        logits = pred.view(-1, vocab_size)
+        labels = label.view(-1)
+
+        # Base loss (token-wise)
+        loss_raw = criterion(logits, labels)
+        loss_raw = loss_raw.view(label.size())  # shape: (B, T)
+
+        # EOS-aware loss masking
+        with torch.no_grad():
+            mask = (label != pad_id).float()
+            pred_ids = torch.argmax(pred, dim=-1)
+
+            for i in range(label.size(0)):
+                eos_pos = (label[i] == eos_id).nonzero(as_tuple=True)[0]
+                if eos_pos.numel() > 0:
+                    eos_idx = eos_pos[0].item()
+                    mask[i, eos_idx + 1:] = 0.0
+
+                    pred_eos_pos = (pred_ids[i] == eos_id).nonzero(as_tuple=True)[0]
+                    if pred_eos_pos.numel() > 0 and pred_eos_pos[0].item() == eos_idx:
+                        eos_correct += 1
+                    eos_total += 1
+
+        loss = (loss_raw * mask).sum() / mask.sum()
 
         loss.backward()
-
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
-
         optimizer.step()
         scheduler.step()
 
         running_loss += loss.item()
 
-    training_loss = running_loss/steps_per_epoch 
-    print(f"epoch:{(epoch+1)}/{epochs}, avg. loss:{training_loss:.5f}")
+    training_loss = running_loss / steps_per_epoch
+    eos_accuracy = eos_correct / eos_total if eos_total > 0 else 0.0
+    #print(f"epoch:{epoch+1}/{epochs}, avg. loss:{training_loss:.5f}, EOS Accuracy: {eos_accuracy:.3f}")
 
-    if (epoch+1) % SAVE_FREQ == 0:
-
+    # Validation + Save
+    if (epoch + 1) % SAVE_FREQ == 0:
         model.eval()
-        
+        val_loss_total = 0
+        eos_correct = 0
+        eos_total = 0
+
         with torch.no_grad():
-            running_loss = 0
             for item in val_loader:
                 src = item['src'].to(device)
                 tgt = item['tgt'].to(device)
@@ -135,19 +163,40 @@ for epoch in range(epochs):
 
                 pred, _, _ = model(src, tgt)
 
-                loss = criterion(pred.view(-1, vocab_size), label.view(-1))
-                
-                running_loss += loss.item()
+                logits = pred.view(-1, vocab_size)
+                labels = label.view(-1)
 
-            val_loss = running_loss/len(val_loader)
-            perplexity = torch.exp(torch.tensor(val_loss)).item()
+                loss_raw = criterion(logits, labels)
+                loss_raw = loss_raw.view(label.size())
+
+                mask = (label != pad_id).float()
+                pred_ids = torch.argmax(pred, dim=-1)
+
+                for i in range(label.size(0)):
+                    eos_pos = (label[i] == eos_id).nonzero(as_tuple=True)[0]
+                    if eos_pos.numel() > 0:
+                        eos_idx = eos_pos[0].item()
+                        mask[i, eos_idx + 1:] = 0.0
+
+                        pred_eos_pos = (pred_ids[i] == eos_id).nonzero(as_tuple=True)[0]
+                        if pred_eos_pos.numel() > 0 and pred_eos_pos[0].item() == eos_idx:
+                            eos_correct += 1
+                        eos_total += 1
+
+                loss = (loss_raw * mask).sum() / mask.sum()
+                val_loss_total += loss.item()
+
+        val_loss = val_loss_total / len(val_loader)
+        perplexity = torch.exp(torch.tensor(val_loss)).item()
+        val_eos_accuracy = eos_correct / eos_total if eos_total > 0 else 0.0
 
         checkpoint_path = os.path.join(experiment_dir, f"model_epoch_{epoch+1}.pth")
         torch.save(model.state_dict(), checkpoint_path)
 
-        print(f"epoch : {epoch+1}, training_loss : {training_loss:.5f}, validation_loss : {val_loss:.5f}, perplexity : {perplexity:.5f}\n")
-        log_line = f"{epoch+1},{training_loss:.5f},{val_loss:.5f},{perplexity:.5f}\n"
-        with open(os.path.join(experiment_dir, "training_info.txt"), 'a') as f:
+        print(f"epoch : {epoch+1}, training_loss : {training_loss:.5f}, validation_loss : {val_loss:.5f}, perplexity : {perplexity:.5f}, EOS Accuracy : {val_eos_accuracy:.3f}")
+
+        log_line = f"{epoch+1},{training_loss:.5f},{val_loss:.5f},{perplexity:.5f},{val_eos_accuracy:.3f}\n"
+        with open(log_path, 'a') as f:
             f.write(log_line)
 
 print("Training Completed.")
