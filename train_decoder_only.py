@@ -1,5 +1,5 @@
 import os
-
+from datetime import datetime
 from tqdm import tqdm
 
 import torch
@@ -51,8 +51,9 @@ dec_ffn_h_dim = MODEL_CONFIG['dec_ffn_h_dim']
 num_dec = MODEL_CONFIG['num_dec']
 use_sinusoidal = MODEL_CONFIG['use_sinusoidal']
 
+timestamp = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 dataset_name = os.path.basename(txt_file_path)
-experiment_name = f"ep{epochs}_b{batch_size}_lr{lr}_dataset_{dataset_name}_token_ch"
+experiment_name = f"ep{epochs}_b{batch_size}_lr{lr}_dataset_{dataset_name}_token_ch_{timestamp}"
 experiment_dir = os.path.join(CHECKPOINT_DIR, CHECKPOINT_PREFIX, experiment_name)
 log_path = os.path.join(experiment_dir, "training_info.txt")
 
