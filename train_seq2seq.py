@@ -23,9 +23,6 @@ val_tgt_path = 'data/iwslt2017_en_de/val_en.txt'
 
 tokenizer = Tokenizer.from_file('tokenizers/seq2seq_shared_tokenizer.json')
 
-eos_id = tokenizer.token_to_id('[EOS]')
-print(f"[EOS] token ID: {eos_id}")
-
 with open(train_src_path, 'r', encoding='utf-8') as f, open(train_tgt_path, 'r', encoding='utf-8') as g:
     de_sentences = f.readlines()
     en_sentences = g.readlines()
@@ -69,7 +66,8 @@ model = TransformerSeq2Seq(vocab_size=vocab_size,
                            ).to(device)
 
 
-token_weights = torch.ones(vocab_size)
+eos_id = tokenizer.token_to_id('[EOS]')
+token_weights = torch.ones(vocab_size).to(device)
 token_weights[eos_id] = 2
 
 label_smoothing = 0.1
