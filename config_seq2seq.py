@@ -41,7 +41,7 @@ SAVE_FREQ = 1
 # Generator Configurations
 # ========================
 
-CHECKPOINT_PATH = "training_experiments/encoder_only/ep30_b64_lr0.0006_dataset_alice_in_wonderland.txt_token_ch/model_epoch_15.pth"
+CHECKPOINT_PATH = "training_experiments/seq2seq/ep40_b64_lr0.0003_dataset_iwslt2017_en_de_token_bpe_2025-06-14T13-27-05/model_epoch_33.pth"
 TXT_FILE_PATH = "data/alice_in_wonderland.txt"
 
 # Top-K Sampling Configurations
