@@ -3,21 +3,23 @@ import torch.nn as nn
 
 from models.encoder_decoder.transformer_seq2seq import TransformerSeq2Seq
 from tokenizers import Tokenizer
+from config_seq2seq import MODEL_CONFIG, SEQ_LEN, CHECKPOINT_PATH, TOPK_CONFIG
 
 tokenizer = Tokenizer.from_file('tokenizers/seq2seq_shared_tokenizer.json')
 
 device = ('cuda' if torch.cuda.is_available() else 'cpu')
 
 vocab_size = tokenizer.get_vocab_size()
-embed_dim = 256
-seq_len = 64
-hidden_dim = 256
-num_heads = 4
-enc_ffn_h_dim = 1024
-dec_ffn_h_dim = 1024
-num_enc = 4
-num_dec = 4
-use_sinusoidal = True
+seq_len = SEQ_LEN
+
+embed_dim = MODEL_CONFIG['embed_dim']
+hidden_dim = MODEL_CONFIG['hidden_dim']
+num_heads = MODEL_CONFIG['num_heads']
+enc_ffn_h_dim = MODEL_CONFIG['enc_ffn_h_dim']
+dec_ffn_h_dim = MODEL_CONFIG['dec_ffn_h_dim']
+num_enc = MODEL_CONFIG['num_enc']
+num_dec = MODEL_CONFIG['num_dec']
+use_sinusoidal = MODEL_CONFIG['use_sinusoidal']
 
 model = TransformerSeq2Seq(
     vocab_size=vocab_size, 
@@ -32,8 +34,7 @@ model = TransformerSeq2Seq(
     use_sinusoidal=use_sinusoidal
 ).to(device)
 
-checkpoint_path = 'training_experiments/seq2seq/ep40_b64_lr0.0003_dataset_iwslt2017_en_de_token_bpe_2025-06-14T13-27-05/model_epoch_33.pth'
-model.load_state_dict(torch.load(checkpoint_path))
+model.load_state_dict(torch.load(CHECKPOINT_PATH))
 model.eval()
 
 bos_id = tokenizer.token_to_id('[BOS]')
@@ -55,8 +56,8 @@ while True:
 
     dec_in = torch.tensor([[bos_id]], dtype=torch.long).to(device)
 
-    temperature = 0.7
-    k = 5
+    temperature = TOPK_CONFIG['temperature']
+    k = TOPK_CONFIG['k']
     max_len = 64
 
     while True:

@@ -10,12 +10,13 @@ from models.encoder_decoder.transformer_seq2seq import TransformerSeq2Seq
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from tokenizers import Tokenizer
+from config_seq2seq import TRAIN_CONFIG, MODEL_CONFIG, SEQ_LEN, SAVE_FREQ, CHECKPOINT_PREFIX, CHECKPOINT_DIR
 
-batch_size = 64
-lr = 0.0003
-epochs = 40
-num_workers = 4
-seq_len = 64
+batch_size = TRAIN_CONFIG['batch_size']
+lr = TRAIN_CONFIG['lr']
+epochs = TRAIN_CONFIG['epochs']
+num_workers = TRAIN_CONFIG['num_workers']
+seq_len = SEQ_LEN
 
 train_src_path = 'data/iwslt2017_en_de/train_de.txt'
 train_tgt_path = 'data/iwslt2017_en_de/train_en.txt'
@@ -44,14 +45,16 @@ steps_per_epoch = len(train_loader)
 max_steps = epochs * steps_per_epoch
 
 vocab_size = tokenizer.get_vocab_size()
-embed_dim = 256
-hidden_dim = 256
-num_heads = 4
-enc_ffn_h_dim = 1024
-dec_ffn_h_dim = 1024
-num_enc = 4
-num_dec = 4
-use_sinusoidal = True
+MODEL_CONFIG['vocab_size'] = vocab_size
+
+embed_dim = MODEL_CONFIG['embed_dim']
+hidden_dim = MODEL_CONFIG['hidden_dim']
+num_heads = MODEL_CONFIG['num_heads']
+enc_ffn_h_dim = MODEL_CONFIG['enc_ffn_h_dim']
+dec_ffn_h_dim = MODEL_CONFIG['dec_ffn_h_dim']
+num_enc = MODEL_CONFIG['num_enc']
+num_dec = MODEL_CONFIG['num_dec']
+use_sinusoidal = MODEL_CONFIG['use_sinusoidal']
 
 model = TransformerSeq2Seq(vocab_size=vocab_size, 
                            embed_dim=embed_dim, 
@@ -78,8 +81,6 @@ criterion = nn.CrossEntropyLoss(weight=token_weights, label_smoothing=label_smoo
 optimizer = torch.optim.AdamW(model.parameters(), weight_decay=1e-4)
 scheduler = CosineAnnealingLR(optimizer=optimizer, T_max=max_steps)
 
-CHECKPOINT_DIR = 'training_experiments'
-CHECKPOINT_PREFIX = 'seq2seq'
 dataset_name = 'iwslt2017_en_de'
 SAVE_FREQ = 1
 
