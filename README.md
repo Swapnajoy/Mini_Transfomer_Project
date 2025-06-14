@@ -194,5 +194,13 @@ The model is trained to perform German-to-English translation using the IWSLT201
 📉 Training Observations
 The training and validation loss curves show a stable training process. Validation loss plateaus and rises slightly after several epochs, possibly indicating early signs of overfitting. Despite this, translation quality is quite good, with reasonable sentence structure and vocabulary usage. However, [EOS] token prediction remains a challenge — the model currently generates until the max sequence length is reached. Further tuning and analysis are required to address this. (This part is a work in progress.)
 
+<p align="center">
+  <img src="Assets/Seq2seq_loss_curves.png" alt="Decoder-only Loss Curves" width="600" height="500"/>
+</p>
+
 🧭 Attention Map Insights
 During inference, the model outputs decoder cross-attention weights, showing how much the decoder attends to each input token when predicting output tokens. These attention heatmaps are insightful for analyzing translation focus and alignment between source and target tokens. Example visualizations will be added in the future.
+
+<p align="center">
+  <img src="Assets/Seq2seq_crossattention_weights_heatmaps.png" alt="Attention weights" width="800"/>
+</p>
