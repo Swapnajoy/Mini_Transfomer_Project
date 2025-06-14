@@ -159,6 +159,40 @@ And the multi-head attention heatmaps from a trained model demonstrate how each 
   <img src="Assets/Decoder_only_attention_weights_heatmaps.png" alt="Attention weights" width="800"/>
 </p>
 
+
 This model generalizes decently, and generated sequences reflect the training data’s language style — but still show occasional instability or repetition in longer generations, especially if trained too long or on a small dataset.
 
-config file for seq2seq, timestamp in the model saving directory, analysis file reorganising.
+# 🔁 Seq2Seq Transformer (Encoder–Decoder Architecture)
+This architecture is modeled after the original Transformer design proposed in the Vaswani et al., 2017 paper (“Attention is All You Need”). It uses both an encoder and a decoder stack to perform sequence-to-sequence tasks such as language translation. The encoder processes the full input sentence (in German), and the decoder auto-regressively generates the translated output sentence (in English), one token at a time.
+
+📍Task Overview:
+The model is trained to perform German-to-English translation using the IWSLT2017 EN↔DE dataset. Tokenization is handled by a Byte-Pair Encoding (BPE) tokenizer trained on the joint corpus of English and German text using HuggingFace’s tokenizers library. The tokenizer captures subword units, which helps in reducing vocabulary size while still generalizing well to rare words.
+
+🧠 Architecture Summary:
+  - The encoder takes the full German sentence and outputs contextual embeddings.
+  - The decoder receives a [BOS] token followed by previously generated tokens and attends to both:
+    - Itself (via masked self-attention to prevent peeking at future tokens).
+    - The encoder’s outputs (via cross-attention).
+  - The training objective is to predict the next English token given the current sequence.
+  - A simplified version of the Vaswani-style block diagram is included below for reference.
+  config file for seq2seq, analysis file reorganising.
+
+<p align="center">
+  <img src="Assets/Seq2Seq_enc_dec_model.png" alt="Decoder-only Block Diagram" width="400"/>
+</p>
+
+📁 Code Locations
+| Component         | Script Path                                     |
+| ----------------- | ----------------------------------------------- |
+| Model Class       | `models/encoder_decoder/transformer_seq2seq.py` |
+| Config            | `config_seq2seq.py`                  |
+| Training Script   | `train_seq2seq_transformer.py`                  |
+| Tokenizer JSON    | `tokenizers/seq2seq_shared_tokenizer.json`      |
+| Dataset Class     | `datasets/seq2seq_dataset.py`                   |
+| Generation Script | `generate_seq2seq_translation.py`               |
+
+📉 Training Observations
+The training and validation loss curves show a stable training process. Validation loss plateaus and rises slightly after several epochs, possibly indicating early signs of overfitting. Despite this, translation quality is quite good, with reasonable sentence structure and vocabulary usage. However, [EOS] token prediction remains a challenge — the model currently generates until the max sequence length is reached. Further tuning and analysis are required to address this. (This part is a work in progress.)
+
+🧭 Attention Map Insights
+During inference, the model outputs decoder cross-attention weights, showing how much the decoder attends to each input token when predicting output tokens. These attention heatmaps are insightful for analyzing translation focus and alignment between source and target tokens. Example visualizations will be added in the future.
