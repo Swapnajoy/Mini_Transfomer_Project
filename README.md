@@ -88,27 +88,23 @@ This model is based purely on a stack of self-attention-based encoder blocks and
 Unlike LSTM models that process inputs sequentially, encoder-only transformers operate on the entire input sequence in parallel. Each token is embedded and enriched with positional encodings, then passed through multiple layers of multi-head self-attention and feedforward blocks. The attention mechanism allows each token to focus on other relevant tokens in the sequence, enabling the model to learn dependencies and semantic relationships irrespective of their positions. Below is a schematic of the encoder-only transformer architecture. After the stack of encoders one fully connected layer was added to map into the dimension of vocab_size, which finally generates the logits.
 
 <p align="center">
-  <img src="Assets\Encoder_only_block_diagram.png" alt="LSTM Loss Curve" width="200"/>
+  <img src="Assets\Encoder_only_block_diagram.png" alt="Encoder-only Block Diagram" width="200"/>
 </p>
 
 The self-attention block plays a crucial role here: it helps the model decide "where to look" when processing a token. By splitting into multiple attention heads, the model can learn various types of relationships (e.g., syntactic vs. semantic) simultaneously across different subspaces. These are later merged and passed through residual and feedforward layers to form rich contextual embeddings for each token.
 
-Training behavior was stable and showed no signs of overfitting in early experiments. A typical training vs. validation loss curve is shown below:
+Training behavior was stable and showed no signs of overfitting in early experiments. Around epoch 15 the validation loss was the lowest, then it showed an overfitting tendency. A typical training vs. validation loss curve is shown below. Also shown is the perplexity. Lower the value, more the model is confident towards some specific tokens for prediction.
 
+<p align="center">
+  <img src="Assets/Encoder_only_loss_curves.png" alt="Encoder-only Loss Curves" width="600" height="500"/>
+</p>
 
-Additionally, attention weight visualizations revealed that earlier layers focus broadly while deeper layers begin to localize attention more precisely, indicating the model's ability to capture both global and contextual semantics.
+In the earlier layers, attention heads exhibit strong diagonals — a clear indication that the model is primarily attending to each token itself or immediate neighbors. This behavior is expected in early stages, as the model hasn't yet learned meaningful contextual relationships and defaults to identity-like attention for stability. However, in the deeper layers, the attention becomes noticeably more diffuse and asymmetric. The diagonals weaken, and we begin to see off-diagonal activations that reflect the model's growing ability to attend to semantically or syntactically relevant tokens elsewhere in the sequence.
 
+<p align="center">
+  <img src="Assets/Encoder_only_attention_weights_heatmaps.png" alt="Attention weights" width="600"/>
+</p>
+
+The visualized attention heads in Layer 6, for instance, show non-trivial attention to non-adjacent tokens, suggesting the model has learned to selectively emphasize information beyond immediate token neighbors
 
 When it comes to generalization, the encoder-only model outperformed LSTMs. On both datasets (Tiny Shakespeare and Alice in Wonderland), the generated sequences retained the stylistic flavor of the original corpus — such as sentence structure and vocabulary — but without directly copying specific sequences. This contrasts sharply with LSTMs, where outputs often became memorized reproductions of the training text, especially when seeded with familiar phrases. The transformer-based model demonstrated more creative recombination of learned patterns, indicating a better understanding of underlying language semantics rather than simple memorization.
-
-Document:
-
-  training for loss curves, overfitting, plateauing etc. Experiment with the hyperparameters.
-  
-  inference, how the generated text compares with the other models. Generalization capability.
-  
-Visualize the results
-
-Finally build a mini transformer based language model
-
-In Progress
