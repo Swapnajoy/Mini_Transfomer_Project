@@ -22,7 +22,7 @@ To evaluate and compare various model architectures, the following datasets were
 
 2. Alice in Wonderland by Lewis Carroll
     - Size: ~150KB of text.
-    - Use Case: Classic English literature offering structured narrative text, used for experimenting with character-level and word-level tokenizations owing o its small vocabulary size.
+    - Use Case: Classic English literature offering structured narrative text, used for experimenting with character-level and word-level tokenizations owing to its small vocabulary size.
     - Applied in: Encoder-only, decoder-only, and LSTM models.
 
 3. IWSLT2017 (EN↔DE Translation)
