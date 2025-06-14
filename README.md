@@ -69,6 +69,33 @@ Custom PyTorch `Dataset` classes were implemented to efficiently handle training
     - Mechanism: Tokenizes and pads both `src` and `tgt` sequences and generatesencoder input, decoder input with `[BOS]` and decoder target (right shifted).
     - Output: Dictionary with `src`, `tgt`, and `label` tensors.
 
+# 📍 Positional Embeddings
+Since transformer models process input sequences in parallel rather than sequentially (like RNNs), they require a mechanism to inject information about token order — this is where positional embeddings come in.
+
+Positional embeddings are added to the input token embeddings to help the model understand the relative or absolute position of each token in a sequence. Without them, the model would treat the input as a bag of words, losing all information about syntax or structure.
+
+This project implements two types of positional embeddings:
+
+1. Fixed (Sinusoidal) Positional Encoding
+    - Based on the formulation from the original Transformer paper (Vaswani et al., 2017).
+    - Uses sine and cosine functions of different frequencies.
+    - Non-trainable and consistent across all inputs.
+    - Implemented in: `models/encoder_only/fixed_positional_encoding.py`
+
+2. Learnable Positional Encoding
+    - A trainable embedding matrix added to the token embeddings.
+    - Learns position representations specific to the dataset/task.
+    - Implemented in: `models/encoder_only/learnable_positional_encoding.py`
+
+All encoder-only, decoder-only, and seq2seq training scripts include a use_sinusoidal boolean flag that can be toggled to switch between fixed and learnable positional encodings.
+
+```
+if use_sinusoidal:
+    self.pe = SinusoidalPositionalEncoding(seq_len, embed_dim)
+else:
+    self.pe = LearnablePositionalEncoding(seq_len, embed_dim)
+```
+
 # 🧠 LSTM Model (Pre-Transformer Baseline)
 The baseline recurrent architecture is implemented in `models/lstm/rnn_LSTM.py`, with training handled via `train_lstm.py` and configurations specified in `config_lstm.py`. Inference or generation from trained checkpoints can be tested using the `generator/lstm_generator.py` script.
 
