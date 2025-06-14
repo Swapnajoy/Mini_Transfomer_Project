@@ -160,3 +160,5 @@ And the multi-head attention heatmaps from a trained model demonstrate how each 
 </p>
 
 This model generalizes decently, and generated sequences reflect the training data’s language style — but still show occasional instability or repetition in longer generations, especially if trained too long or on a small dataset.
+
+config file for seq2seq, timestamp in the model saving directory, analysis file reorganising.
